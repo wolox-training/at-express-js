@@ -1,5 +1,5 @@
 # WTraining
-
+[![Build Status](https://travis-ci.com/wolox-training/at-express-js.svg?branch=master)](https://travis-ci.com/wolox-training/at-express-js)
 WTraining
 
 ## First steps
