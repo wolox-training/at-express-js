@@ -1,17 +1,21 @@
-const { getAlbums, getAlbum } = require('../services/get_albums');
-const { getPhotos } = require('../services/get_photos');
+const { getAllAlbums, getAlbumById, getPhotosByAlbum } = require('../services/externalServices');
 
-exports.albums = (req, res, next) => {
+const sendResponse = res => response => {
+  res.status(response.status || 200);
+  res.json(response);
+};
+
+exports.getAlbums = (req, res, next) => {
   const albumId = req.params.id;
-  const respond = albumId ? getAlbum : getAlbums;
-  return respond(albumId)
-    .then(response => res.json(response.data))
+  const selectGetFn = albumId ? getAlbumById : getAllAlbums;
+  return selectGetFn(albumId)
+    .then(sendResponse(res))
     .catch(next);
 };
 
-exports.photos = (req, res, next) => {
+exports.getPhotos = (req, res, next) => {
   const albumId = req.params.id;
-  return getPhotos(albumId)
-    .then(response => res.json(response.data))
+  return getPhotosByAlbum(albumId)
+    .then(sendResponse(res))
     .catch(next);
 };
