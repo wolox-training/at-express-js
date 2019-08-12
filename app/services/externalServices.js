@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { externalEndpoints } = require('../../config/externalEndpoints');
+const { albumsEndpoint, photosEndpoint } = require('../../config').common.externalApi;
 const { externalApiError } = require('../errors');
 
 const formatData = a => a.data;
@@ -9,9 +9,9 @@ const processExternalRequest = request =>
     throw externalApiError(responseError.message);
   });
 
-exports.getAllAlbums = () => processExternalRequest(axios.get(externalEndpoints.albums));
+exports.getAllAlbums = () => processExternalRequest(axios.get(albumsEndpoint));
 
-exports.getAlbumById = albumId => processExternalRequest(axios.get(`${externalEndpoints.albums}/${albumId}`));
+exports.getAlbumById = albumId => processExternalRequest(axios.get(`${albumsEndpoint}/${albumId}`));
 
 exports.getPhotosByAlbum = albumId =>
-  processExternalRequest(axios.get(`${externalEndpoints.photos}/?albumId=${albumId}`));
+  processExternalRequest(axios.get(`${photosEndpoint}/?albumId=${albumId}`));
