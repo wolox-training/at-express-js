@@ -38,6 +38,10 @@ const config = {
       parameterLimit: process.env.API_PARAMETER_LIMIT,
       port: process.env.PORT
     },
+    externalApi: {
+      albumsEndpoint: process.env.EXTERNAL_API_ALBUMS,
+      photosEndpoint: process.env.EXTERNAL_API_PHOTOS
+    },
     session: {
       header_name: 'authorization',
       secret: process.env.NODE_API_SESSION_SECRET
