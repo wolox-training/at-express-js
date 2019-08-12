@@ -2,7 +2,7 @@ const axios = require('axios');
 const { albumsEndpoint, photosEndpoint } = require('../../config').common.externalApi;
 const { externalApiError } = require('../errors');
 
-const formatData = a => a.data;
+const formatData = response => response.data;
 
 const processExternalRequest = request =>
   request.then(formatData).catch(responseError => {
