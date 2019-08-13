@@ -6,6 +6,6 @@ exports.signUp = (req, res, next) =>
     .then(hashedUser => user.create(hashedUser))
     .then(result => {
       const { firstName } = result.dataValues;
-      res.send({ message: `A user "${firstName}" has been created` });
+      res.send({ message: `A user '${firstName}' has been created` });
     })
     .catch(next);
