@@ -1,24 +1,40 @@
-const { validationError } = require('./errors');
+const { validationError } = require('../errors');
+const logger = require('../logger');
+const { validations } = require('../helpers');
 
-const validateUser = user => ({
-  isEmailValid: () => true,
-  checkEmailDomain: domain => !!domain,
-  hasRequiredFields: requiredFields => !!requiredFields,
-  isAlfanumeric: () => true,
-  checkLength: length => user.length >= length
-});
+const requiredFields = ['firstName', 'lastName', 'email', 'password'];
+const emailDomain = 'wolox.com.ar';
+const formats = [/[0-9]/, /[a-zA-Z]/];
+const minLength = 8;
+const handleError = next => message => {
+  logger.error(message);
+  return next(validationError(message));
+};
 
 exports.userValidation = (req, res, next) => {
-  const user = req.body;
-  // TODO: terminar validaciones
-  if (!user) {
-    return next(validationError('missing request data'));
+  const { checkMissingFields, isEmailValid, checkEmailDomain, isFormatValid, checkMinLength } = validations(
+    req.body
+  );
+  const missingFields = checkMissingFields(requiredFields);
+  const error = handleError(next);
+
+  if (missingFields) {
+    error(`missing required fields: ${missingFields.join(', ')}`);
   }
 
-  const userValidation = validateUser(user);
+  if (!isEmailValid()) {
+    error('Email is not valid');
+  }
 
-  if (!userValidation.isEmailValid()) {
-    next(validationError('Email is not valid'));
+  if (!checkEmailDomain(emailDomain)) {
+    error(`The email must be @${emailDomain}`);
+  }
+  if (!isFormatValid('password', formats)) {
+    error('Password format invalid');
+  }
+
+  if (!checkMinLength(minLength)) {
+    error(`Password must be at least ${minLength} characters`);
   }
 
   return next();
