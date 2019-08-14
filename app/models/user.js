@@ -23,5 +23,5 @@ module.exports = (sequelize, DataTypes) =>
         allowNull: false
       }
     },
-    {}
+    { underscored: true }
   );
