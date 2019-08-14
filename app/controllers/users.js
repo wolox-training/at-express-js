@@ -9,7 +9,7 @@ exports.signUp = (req, res, next) =>
       const { firstName } = result.dataValues;
       const message = `A user '${firstName}' has been created`;
       logger.info(message);
-      res.send({ message });
+      res.status(201).end();
     })
     .catch(error => {
       logger.error(error.message);
