@@ -9,12 +9,12 @@ module.exports = (sequelize, DataTypes) => {
       firstName: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'first-name'
+        field: 'first_name'
       },
       lastName: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'last-name'
+        field: 'last_name'
       },
       email: {
         type: DataTypes.STRING,
@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.createUser = user =>
     User.create(user).catch(error => {
-      const { message } = error.errors[0];
+      const message = error.errors ? error.errors[0] : error.name;
       logger.error(message);
       throw databaseError(`Unable to create new user. ${message}`);
     });
