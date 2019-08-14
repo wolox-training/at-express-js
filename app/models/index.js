@@ -21,9 +21,7 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
-// esta db
 db.sequelize = sequelize;
-// modulo Sequelize
 db.Sequelize = Sequelize;
 
 module.exports = db;

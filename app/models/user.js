@@ -4,15 +4,8 @@ const { databaseError } = require('../errors');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
-    'user',
+    'User',
     {
-      id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        unique: true,
-        autoIncrement: true,
-        primaryKey: true
-      },
       firstName: {
         type: DataTypes.STRING,
         allowNull: false
