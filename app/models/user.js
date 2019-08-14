@@ -6,12 +6,12 @@ module.exports = (sequelize, DataTypes) =>
       firstName: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'first-name'
+        field: 'first_name'
       },
       lastName: {
         type: DataTypes.STRING,
         allowNull: false,
-        field: 'last-name'
+        field: 'last_name'
       },
       email: {
         type: DataTypes.STRING,
