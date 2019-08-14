@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       }
     },
-    {}
+    { underscored: true }
   );
 
   User.createUser = user =>
