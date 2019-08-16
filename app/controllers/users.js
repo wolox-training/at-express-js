@@ -2,16 +2,16 @@ const logger = require('../logger');
 const { User } = require('../models');
 const { hashPassword } = require('../helpers');
 
-exports.signUp = (req, res, next) =>
-  hashPassword(req.body)
+exports.signUp = (req, res, next) => {
+  const { firstName, lastName, email, password } = req.body;
+  return hashPassword({ firstName, lastName, email, password })
     .then(hashedUser => User.createUser(hashedUser))
     .then(result => {
-      const { firstName } = result.dataValues;
-      const message = `A user '${firstName}' has been created`;
-      logger.info(message);
-      res.status(201).end();
+      logger.info(`A user '${result.dataValues.firstName}' has been created`);
+      res.status(201).send();
     })
     .catch(error => {
       logger.error(error.message);
       next(error);
     });
+};

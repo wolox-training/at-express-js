@@ -1,6 +1,7 @@
 'use strict';
 const logger = require('../logger');
 const { databaseError } = require('../errors');
+const { dbErrorCodes } = require('../helpers');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -31,9 +32,12 @@ module.exports = (sequelize, DataTypes) => {
 
   User.createUser = user =>
     User.create(user).catch(error => {
-      const message = error.errors ? error.errors[0] : error.name;
+      const { message, errorFn } = dbErrorCodes[error.name] || { message: 'Unable to create new user.' };
+      if (errorFn) {
+        throw errorFn(`Unable to create new user. ${message}`);
+      }
       logger.error(message);
-      throw databaseError(`Unable to create new user. ${message}`);
+      throw databaseError('Unable to create new user.');
     });
 
   return User;
