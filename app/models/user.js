@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.createUser = user =>
     User.create(user).catch(error => {
+      logger.error(error);
       const { message, errorFn } = dbErrorCodes[error.name] || { message: 'Unable to create new user.' };
       if (errorFn) {
         throw errorFn(`Unable to create new user. ${message}`);
