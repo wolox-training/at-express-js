@@ -4,9 +4,13 @@ const errors = require('../errors'),
 const DEFAULT_STATUS_CODE = 500;
 
 const statusCodes = {
-  [errors.DATABASE_ERROR]: 503,
+  [errors.DATABASE_ERROR]: 500,
   [errors.DEFAULT_ERROR]: 500,
-  [errors.EXTERNAL_API_ERROR]: 502
+  [errors.EXTERNAL_API_ERROR]: 502,
+  [errors.VALIDATION_ERROR]: 422,
+  [errors.ENCRYPTION_ERROR]: 500,
+  [errors.ENTITY_ALREADY_EXISTS]: 422,
+  [errors.MISSING_DATA_ERROR]: 400
 };
 
 exports.handle = (error, req, res, next) => {
