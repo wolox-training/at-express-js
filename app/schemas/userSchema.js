@@ -1,4 +1,4 @@
-const { EMAIL_DOMAIN, PASSWORD_FORMATS, MIN_LENGTH } = require('./constants');
+const { EMAIL_DOMAIN, PASSWORD_FORMATS, MIN_LENGTH } = require('../helpers/constants');
 exports.userSchema = {
   firstName: {
     in: ['body'],
