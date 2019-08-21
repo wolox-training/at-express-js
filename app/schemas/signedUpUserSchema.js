@@ -1,8 +1,10 @@
 const {
   EMAIL_DOMAIN,
   PASSWORD_FORMATS,
+  MIN_LENGTH,
   invalidEmailDomainMessage,
-  invalidPasswordMessage
+  invalidPasswordMessage,
+  invalidPasswordLengthMessage
 } = require('../helpers');
 
 exports.signedUpUserSchema = {
@@ -35,6 +37,12 @@ exports.signedUpUserSchema = {
           return result;
         }, true),
       errorMessage: invalidPasswordMessage
+    },
+    isLength: {
+      options: {
+        min: MIN_LENGTH
+      },
+      errorMessage: invalidPasswordLengthMessage
     }
   }
 };
