@@ -21,6 +21,7 @@ const {
   firstNameMissingUser,
   lastNameMissingUser
 } = require('./mocks/mockUsers');
+const { ENTITY_ALREADY_EXISTS, MISSING_DATA_ERROR, VALIDATION_ERROR } = require('../app/errors');
 const request = supertest(app);
 
 describe('POST /users', () => {
@@ -50,6 +51,7 @@ describe('POST /users', () => {
       .then(() => request.post('/users').send(mockUser))
       .then(response => {
         expect(response.body.message).to.include(alreadyExistsErrorMessage);
+        expect(response.body.internal_code).to.equal(ENTITY_ALREADY_EXISTS);
         expect(response.statusCode).to.equal(422);
       }));
 
@@ -59,6 +61,7 @@ describe('POST /users', () => {
       .send(passwordTooShortUser)
       .then(response => {
         expect(response.body.message).to.include(invalidPasswordLengthMessage);
+        expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
         expect(response.statusCode).to.equal(422);
       });
   });
@@ -69,6 +72,7 @@ describe('POST /users', () => {
       .send(wrongFormatPasswordUser)
       .then(response => {
         expect(response.body.message).to.include(invalidPasswordMessage);
+        expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
         expect(response.statusCode).to.equal(422);
       }));
 
@@ -78,6 +82,7 @@ describe('POST /users', () => {
       .send(wrongDomainUser)
       .then(response => {
         expect(response.body.message).to.include(invalidEmailDomain);
+        expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
         expect(response.statusCode).to.equal(422);
       }));
 
@@ -88,6 +93,7 @@ describe('POST /users', () => {
       .then(response => {
         expect(response.body.message).to.include(missingRequiredFieldsMessage);
         expect(response.body.message).to.include('firstName');
+        expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
         expect(response.statusCode).to.equal(400);
       }));
 
@@ -98,6 +104,7 @@ describe('POST /users', () => {
       .then(response => {
         expect(response.body.message).to.include(missingRequiredFieldsMessage);
         expect(response.body.message).to.include('lastName');
+        expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
         expect(response.statusCode).to.equal(400);
       }));
 
@@ -108,6 +115,7 @@ describe('POST /users', () => {
       .then(response => {
         expect(response.body.message).to.include(missingRequiredFieldsMessage);
         expect(response.body.message).to.include('email');
+        expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
         expect(response.statusCode).to.equal(400);
       }));
 
@@ -118,6 +126,7 @@ describe('POST /users', () => {
       .then(response => {
         expect(response.body.message).to.include(missingRequiredFieldsMessage);
         expect(response.body.message).to.include('password');
+        expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
         expect(response.statusCode).to.equal(400);
       }));
 
@@ -132,5 +141,7 @@ describe('POST /users', () => {
         expect(msg).to.include('lastName');
         expect(msg).to.include('email');
         expect(msg).to.include('password');
+        expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
+        expect(response.statusCode).to.equal(400);
       }));
 });
