@@ -1,28 +1,28 @@
 const bcrypt = require('bcryptjs');
 const { SALT_ROUNDS } = require('./constants');
-const { encryptionError, authenticationError } = require('../errors');
-const { authenticationErrorMessage } = require('../helpers/constants');
+const { encryptionError, authenticationError, AUTHENTICATION_ERROR } = require('../errors');
+const { authenticationErrorMessage } = require('../helpers');
+
+const sendError = error => {
+  if (error.internalCode === AUTHENTICATION_ERROR) {
+    throw authenticationError(error.message);
+  }
+  throw encryptionError(error.message);
+};
 
 exports.hashPassword = user =>
   bcrypt
     .hash(user.password, SALT_ROUNDS)
     .then(password => ({ ...user, password }))
-    .catch(error => {
-      throw encryptionError(error.message);
-    });
+    .catch(sendError);
 
 exports.comparePassword = ({ user, sentUser }) =>
   bcrypt
-    .compare(user.password, sentUser.password)
+    .compare(sentUser.password, user.password)
     .then(arePasswordEql => {
       if (arePasswordEql) {
         return user;
       }
       throw authenticationError(authenticationErrorMessage);
     })
-    .catch(error => {
-      if (error.message === authenticationErrorMessage) {
-        throw authenticationError(authenticationErrorMessage);
-      }
-      throw encryptionError(error.message);
-    });
+    .catch(sendError);

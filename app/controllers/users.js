@@ -1,6 +1,6 @@
 const logger = require('../logger');
 const { User } = require('../models');
-const { hashPassword, comparePassword } = require('../helpers');
+const { hashPassword, createToken } = require('../helpers');
 
 exports.signUp = (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -17,19 +17,12 @@ exports.signUp = (req, res, next) => {
 };
 
 exports.signIn = (req, res, next) => {
-  const { email, password } = req.body;
-  const sentUser = { email, password };
+  const { email } = req.body;
 
-  return User.findOne({ where: { email } })
-    .then(response => {
-      const user = response && response.dataValues;
-      if (!user) {
-        next('error');
-      }
-      return comparePassword({ user, sentUser });
-    })
-    .then(user => {
-      res.send({ user });
-    })
-    .catch(next);
+  return createToken(email)
+    .then(token => res.set('authorization', token).end())
+    .catch(error => {
+      logger.error(error.message);
+      next(error);
+    });
 };

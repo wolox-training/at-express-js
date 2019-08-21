@@ -11,3 +11,4 @@ exports.invalidPasswordMessage = 'Password format invalid';
 exports.invalidPasswordLengthMessage = `Password must be at least ${exports.MIN_LENGTH} characters`;
 exports.invalidEmailDomain = `The email must be @${exports.EMAIL_DOMAIN}`;
 exports.authenticationErrorMessage = 'Unable to authenticate credentials';
+exports.usernameNotFoundErrorMessage = 'Username not found';
