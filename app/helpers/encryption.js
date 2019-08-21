@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { SALT_ROUNDS } = require('./constants');
 const { encryptionError, authenticationError, AUTHENTICATION_ERROR } = require('../errors');
-const { authenticationErrorMessage } = require('../helpers');
+const { authenticationErrorMessage } = require('./constants');
 
 const sendError = error => {
   if (error.internalCode === AUTHENTICATION_ERROR) {
@@ -16,9 +16,9 @@ exports.hashPassword = user =>
     .then(password => ({ ...user, password }))
     .catch(sendError);
 
-exports.comparePassword = ({ user, sentUser }) =>
+exports.comparePassword = ({ user, password }) =>
   bcrypt
-    .compare(sentUser.password, user.password)
+    .compare(password, user.password)
     .then(arePasswordEql => {
       if (arePasswordEql) {
         return user;

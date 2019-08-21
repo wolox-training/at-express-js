@@ -41,10 +41,18 @@ module.exports = (sequelize, DataTypes) => {
       throw databaseError('Unable to create new user.');
     });
 
-  User.findByEmail = user =>
-    User.findOne({ where: { user: user.email } })
-      .then(response => (response && response.dataValues ? [response.dataValues, user] : null))
-      .catch();
+  User.findByEmail = email =>
+    User.findOne({ where: { email } })
+      .then(response => response && response.dataValues)
+      .catch(error => {
+        logger.error(error);
+        const { message, errorFn } = dbErrorCodes[error.name] || { message: 'Unable to find user.' };
+        if (errorFn) {
+          throw errorFn(`Unable to find user. ${message}`);
+        }
+        logger.error(message);
+        throw databaseError('Unable to find user.');
+      });
 
   return User;
 };

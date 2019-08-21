@@ -16,13 +16,8 @@ exports.signUp = (req, res, next) => {
     });
 };
 
-exports.signIn = (req, res, next) => {
+exports.signIn = (req, res) => {
   const { email } = req.body;
-
-  return createToken(email)
-    .then(token => res.set('authorization', token).end())
-    .catch(error => {
-      logger.error(error.message);
-      next(error);
-    });
+  const token = createToken(email);
+  res.send({ token }).end();
 };

@@ -1,5 +1,6 @@
+const logger = require('../logger');
 const { User } = require('../models');
-const { comparePassword, usernameNotFoundErrorMessage, invalidPasswordMessage } = require('../helpers');
+const { comparePassword, usernameNotFoundErrorMessage } = require('../helpers');
 const { authenticationError } = require('../errors');
 
 exports.validatePassword = (req, res, next) => {
@@ -12,10 +13,9 @@ exports.validatePassword = (req, res, next) => {
       }
       return comparePassword({ user, password });
     })
-    .then(passwordCheck => {
-      if (passwordCheck) {
-        next();
-      }
-      next(authenticationError(invalidPasswordMessage));
+    .then(() => next())
+    .catch(error => {
+      logger.error(error);
+      next(error);
     });
 };
