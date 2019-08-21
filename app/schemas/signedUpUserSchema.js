@@ -1,4 +1,9 @@
-const { EMAIL_DOMAIN, PASSWORD_FORMATS, invalidEmailDomain, invalidPasswordMessage } = require('../helpers');
+const {
+  EMAIL_DOMAIN,
+  PASSWORD_FORMATS,
+  invalidEmailDomainMessage,
+  invalidPasswordMessage
+} = require('../helpers');
 
 exports.signedUpUserSchema = {
   email: {
@@ -12,7 +17,7 @@ exports.signedUpUserSchema = {
     },
     matches: {
       options: [EMAIL_DOMAIN],
-      errorMessage: invalidEmailDomain
+      errorMessage: invalidEmailDomainMessage
     }
   },
   password: {

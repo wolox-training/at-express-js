@@ -4,7 +4,7 @@ const {
   MIN_LENGTH,
   invalidPasswordMessage,
   invalidPasswordLengthMessage,
-  invalidEmailDomain
+  invalidEmailDomainMessage
 } = require('../helpers');
 
 exports.userSchema = {
@@ -33,7 +33,7 @@ exports.userSchema = {
     },
     matches: {
       options: [EMAIL_DOMAIN],
-      errorMessage: invalidEmailDomain
+      errorMessage: invalidEmailDomainMessage
     }
   },
   password: {

@@ -8,7 +8,7 @@ const {
   alreadyExistsErrorMessage,
   invalidPasswordLengthMessage,
   invalidPasswordMessage,
-  invalidEmailDomain,
+  invalidEmailDomainMessage,
   missingRequiredFieldsMessage
 } = require('../app/helpers');
 
@@ -88,7 +88,7 @@ describe('POST /users', () => {
       .post('/users')
       .send(errorUser)
       .then(response => {
-        expect(response.body.message).to.include(invalidEmailDomain);
+        expect(response.body.message).to.include(invalidEmailDomainMessage);
         expect(response.statusCode).to.equal(422);
       });
   });
