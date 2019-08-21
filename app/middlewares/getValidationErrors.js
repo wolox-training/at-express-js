@@ -1,12 +1,13 @@
 const { validationResult } = require('express-validator');
 const { missingDataError, validationError } = require('../errors');
+const { missingRequiredFieldsMessage } = require('../helpers/constants');
 
 exports.getValidationErrors = (req, res, next) => {
   const { errors } = validationResult(req);
   const missingFields = errors.filter(e => e.msg === 'missing_field');
 
   if (missingFields.length) {
-    const message = `missing required fields: ${missingFields.map(e => e.param).join(', ')}`;
+    const message = `${missingRequiredFieldsMessage} ${missingFields.map(e => e.param).join(', ')}`;
     return next(missingDataError(message));
   }
 

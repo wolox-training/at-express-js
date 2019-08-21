@@ -1,4 +1,12 @@
-const { EMAIL_DOMAIN, PASSWORD_FORMATS, MIN_LENGTH } = require('../helpers/constants');
+const {
+  EMAIL_DOMAIN,
+  PASSWORD_FORMATS,
+  MIN_LENGTH,
+  invalidPasswordMessage,
+  invalidPasswordLengthMessage,
+  invalidEmailDomain
+} = require('../helpers/constants');
+
 exports.userSchema = {
   firstName: {
     in: ['body'],
@@ -25,7 +33,7 @@ exports.userSchema = {
     },
     matches: {
       options: [EMAIL_DOMAIN],
-      errorMessage: `The email must be @${EMAIL_DOMAIN}`
+      errorMessage: invalidEmailDomain
     }
   },
   password: {
@@ -42,13 +50,13 @@ exports.userSchema = {
           }
           return result;
         }, true),
-      errorMessage: 'Password format invalid'
+      errorMessage: invalidPasswordMessage
     },
     isLength: {
       options: {
         min: MIN_LENGTH
       },
-      errorMessage: `Password must be at least ${MIN_LENGTH} characters`
+      errorMessage: invalidPasswordLengthMessage
     }
   }
 };
