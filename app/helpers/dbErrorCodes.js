@@ -1,12 +1,13 @@
 const { entityAlreadyExists, validationError } = require('../errors');
+const { alreadyExistsErrorMessage, validationErrorMessage } = require('../helpers/constants');
 
 exports.dbErrorCodes = {
   SequelizeUniqueConstraintError: {
-    message: 'The resource you are trying to create already exists',
+    message: alreadyExistsErrorMessage,
     errorFn: entityAlreadyExists
   },
   SequelizeValidationError: {
-    message: 'There has been a validation error',
+    message: validationErrorMessage,
     errorFn: validationError
   }
 };
