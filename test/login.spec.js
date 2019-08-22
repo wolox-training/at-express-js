@@ -33,7 +33,7 @@ describe('POST /users/sessions', () => {
       .then(login(loggingUser))
       .then(response => {
         expect(response.statusCode).to.equal(200);
-        expect(response.body).to.have.property('token');
+        expect(response.headers).to.have.property('authorization');
       }));
 
   it('should fail because email is not @wolox.com.ar', () =>
