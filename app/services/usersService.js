@@ -4,9 +4,10 @@ const { userNotFoundErrorMessage, getUserFields } = require('../helpers');
 const { port, host } = require('../../config').common.api;
 const { pageSize } = require('../../config').common.api;
 
-exports.getAllUsers = (page = 1) => () => {
+exports.getAllUsers = (getPage = 1) => () => {
+  const page = parseInt(getPage);
   const offset = (page - 1) * pageSize;
-  const limit = offset + parseInt(pageSize);
+  const limit = parseInt(pageSize);
 
   return User.getAll({ offset, limit }).then(response => {
     const areNext = offset + limit < response.count;

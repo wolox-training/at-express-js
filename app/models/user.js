@@ -14,14 +14,10 @@ const handleError = genericMessage => error => {
 };
 
 const prepareResponse = response => {
-  if (!response) {
-    throw databaseError('Unable to perform request');
-  }
-
   if (Array.isArray(response)) {
     return response.map(e => e.dataValues);
   }
-  return response.dataValues;
+  return response && response.dataValues;
 };
 
 module.exports = (sequelize, DataTypes) => {
