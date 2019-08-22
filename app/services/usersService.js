@@ -9,8 +9,8 @@ exports.getAllUsers = (getPage = 1) => () => {
   const page = parseInt(getPage);
   const offset = (page - 1) * pageSize;
   const limit = parseInt(pageSize);
-  logger.info(page);
   logger.info(limit);
+  logger.info(pageSize);
 
   return User.getAll({ offset, limit }).then(response => {
     const areNext = offset + limit < response.count;
