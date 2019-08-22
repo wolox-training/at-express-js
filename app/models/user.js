@@ -13,7 +13,16 @@ const handleError = genericMessage => error => {
   throw databaseError(genericMessage);
 };
 
-const sendResponse = response => response && response.dataValues;
+const prepareResponse = response => {
+  if (!response) {
+    throw databaseError('Unable to perform request');
+  }
+
+  if (Array.isArray(response)) {
+    return response.map(e => e.dataValues);
+  }
+  return response.dataValues;
+};
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -44,17 +53,20 @@ module.exports = (sequelize, DataTypes) => {
 
   User.createUser = user =>
     User.create(user)
-      .then(sendResponse)
+      .then(prepareResponse)
       .catch(handleError('Unable to create new user'));
 
   User.findByEmail = email =>
     User.findOne({ where: { email } })
-      .then(sendResponse)
+      .then(prepareResponse)
       .catch(handleError('Unable to find user'));
 
-  User.getAll = () =>
-    User.findAll()
-      .then(sendResponse)
+  User.getAll = ({ offset, limit }) =>
+    User.findAndCountAll({ offset, limit })
+      .then(result => ({
+        count: result.count,
+        rows: prepareResponse(result.rows)
+      }))
       .catch(handleError('Unable to get users'));
 
   return User;

@@ -5,7 +5,7 @@ const {
   invalidPasswordMessage,
   invalidPasswordLengthMessage,
   invalidEmailDomainMessage
-} = require('../helpers');
+} = require('../helpers/constants');
 
 exports.userSchema = {
   firstName: {

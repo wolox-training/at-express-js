@@ -24,7 +24,8 @@ exports.signIn = (req, res) => {
 
 exports.getUsers = (req, res, next) => {
   const { email } = req.params;
-  const selectGetFn = email ? getUserByEmail : getAllUsers;
+  const { page } = req.query;
+  const selectGetFn = email ? getUserByEmail : getAllUsers(page);
   return selectGetFn(email)
     .then(response => res.send(response))
     .catch(next);

@@ -11,7 +11,8 @@ const statusCodes = {
   [errors.ENCRYPTION_ERROR]: 500,
   [errors.ENTITY_ALREADY_EXISTS]: 422,
   [errors.MISSING_DATA_ERROR]: 400,
-  [errors.AUTHENTICATION_ERROR]: 401
+  [errors.AUTHENTICATION_ERROR]: 401,
+  [errors.NOT_FOUND_ERROR]: 404
 };
 
 exports.handle = (error, req, res, next) => {
