@@ -3,6 +3,18 @@ const logger = require('../logger');
 const { databaseError } = require('../errors');
 const { dbErrorCodes } = require('../helpers');
 
+const handleError = genericMessage => error => {
+  logger.error(error);
+  const { message, errorFn } = dbErrorCodes[error.name] || { message: genericMessage };
+  if (errorFn) {
+    throw errorFn(`${genericMessage}. ${message}`);
+  }
+  logger.error(message);
+  throw databaseError(genericMessage);
+};
+
+const sendResponse = response => response && response.dataValues;
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
@@ -31,28 +43,19 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   User.createUser = user =>
-    User.create(user).catch(error => {
-      logger.error(error);
-      const { message, errorFn } = dbErrorCodes[error.name] || { message: 'Unable to create new user.' };
-      if (errorFn) {
-        throw errorFn(`Unable to create new user. ${message}`);
-      }
-      logger.error(message);
-      throw databaseError('Unable to create new user.');
-    });
+    User.create(user)
+      .then(sendResponse)
+      .catch(handleError('Unable to create new user'));
 
   User.findByEmail = email =>
     User.findOne({ where: { email } })
-      .then(response => response && response.dataValues)
-      .catch(error => {
-        logger.error(error);
-        const { message, errorFn } = dbErrorCodes[error.name] || { message: 'Unable to find user.' };
-        if (errorFn) {
-          throw errorFn(`Unable to find user. ${message}`);
-        }
-        logger.error(message);
-        throw databaseError('Unable to find user.');
-      });
+      .then(sendResponse)
+      .catch(handleError('Unable to find user'));
+
+  User.getAll = () =>
+    User.findAll()
+      .then(sendResponse)
+      .catch(handleError('Unable to get users'));
 
   return User;
 };
