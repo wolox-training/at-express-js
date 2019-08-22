@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const app = require('../app');
 const request = supertest(app);
 const { createUsers } = require('./helpers');
-const { host, port } = require('../config').common.api;
+const { host, port } = require('../config').common;
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
 
 describe('GET /users', () => {
