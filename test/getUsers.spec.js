@@ -10,7 +10,7 @@ describe('GET /users', () => {
   it('should success when user is logged in', () =>
     createUsers(25)
       .then(() =>
-        request.post('/users/sessions').send({ email: 'mail0@wolox.com.ar', password: '1234587ocho' })
+        request.post('/users/sessions').send({ email: 'mail1@wolox.com.ar', password: '1234587ocho' })
       )
       .then(response => {
         const token = response.headers.authorization;
@@ -60,11 +60,11 @@ describe('GET /users/:email', () => {
   it('should success when user is logged in', () =>
     createUsers(25)
       .then(() =>
-        request.post('/users/sessions').send({ email: 'mail0@wolox.com.ar', password: '1234587ocho' })
+        request.post('/users/sessions').send({ email: 'mail1@wolox.com.ar', password: '1234587ocho' })
       )
       .then(response => {
         const token = response.headers.authorization;
-        return request.get('/users/mail1@wolox.com.ar').set({ authorization: token });
+        return request.get('/users/mail2@wolox.com.ar').set({ authorization: token });
       })
       .then(response => {
         expect(response.statusCode).to.equal(200);
@@ -75,7 +75,7 @@ describe('GET /users/:email', () => {
 
   it('should fail because user is not authenticated', () =>
     request
-      .get('/users/mail1@wolox.com.ar')
+      .get('/users/mail2@wolox.com.ar')
       .set({ authorization: 'something wrong' })
       .then(response => {
         expect(response.statusCode).to.equal(401);
@@ -85,11 +85,11 @@ describe('GET /users/:email', () => {
   it('should fail because user requested does not exist', () =>
     createUsers(1)
       .then(() =>
-        request.post('/users/sessions').send({ email: 'mail0@wolox.com.ar', password: '1234587ocho' })
+        request.post('/users/sessions').send({ email: 'mail1@wolox.com.ar', password: '1234587ocho' })
       )
       .then(response => {
         const token = response.headers.authorization;
-        return request.get('/users/mail1@wolox.com.ar').set({ authorization: token });
+        return request.get('/users/mail2@wolox.com.ar').set({ authorization: token });
       })
       .then(response => {
         expect(response.statusCode).to.equal(404);

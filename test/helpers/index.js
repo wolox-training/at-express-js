@@ -4,16 +4,20 @@ const app = require('../../app');
 const request = supertest(app);
 
 exports.createUsers = count => {
-  const promises = [];
-  for (let i = 0; i < count; i++) {
+  const createArray = (arr, counting) => {
     const mockUser = {
       firstName: chance.first(),
       lastName: chance.last(),
-      email: `mail${i}@wolox.com.ar`,
+      email: `mail${counting}@wolox.com.ar`,
       password: '1234587ocho'
     };
 
-    promises.push(request.post('/users').send(mockUser));
-  }
+    if (counting === 1) {
+      return [...arr, request.post('/users').send(mockUser)];
+    }
+    return createArray([...arr, request.post('/users').send(mockUser)], counting - 1);
+  };
+
+  const promises = createArray([], count);
   return Promise.all(promises);
 };
