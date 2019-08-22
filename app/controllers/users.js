@@ -18,5 +18,5 @@ exports.signUp = (req, res, next) => {
 
 exports.signIn = (req, res) => {
   const token = createToken(req.body.email);
-  res.send({ token }).end();
+  res.set('authorization', token).end();
 };
