@@ -5,6 +5,7 @@ const request = supertest(app);
 const { createUsers } = require('./helpers');
 const { host, port } = require('../config').common.api;
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
+const logger = require('../app/logger');
 
 describe('GET /users', () => {
   it('should success when user is logged in', () =>
@@ -19,6 +20,7 @@ describe('GET /users', () => {
       })
       .then(([response, token]) => {
         const { count, result, prev, next } = response.body;
+        logger.info(response);
         expect(response.statusCode).to.equal(200);
         expect(count).to.equal(25);
         expect(result.length).to.equal(10);
