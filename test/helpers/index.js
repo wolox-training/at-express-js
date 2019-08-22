@@ -1,5 +1,7 @@
 const chance = require('chance')();
-const { User } = require('../../app/models');
+const supertest = require('supertest');
+const app = require('../../app');
+const request = supertest(app);
 
 exports.createUsers = count => {
   const promises = [];
@@ -8,10 +10,10 @@ exports.createUsers = count => {
       firstName: chance.first(),
       lastName: chance.last(),
       email: `mail${i}@wolox.com.ar`,
-      password: chance.word({ length: 8 }) + chance.integer({ min: 0, max: 9 })
+      password: '1234587ocho'
     };
 
-    promises.push(User.createUser(mockUser));
+    promises.push(request.post('/users').send(mockUser));
   }
   return Promise.all(promises);
 };
