@@ -1,6 +1,6 @@
 const logger = require('../logger');
 const { User } = require('../models');
-const { comparePassword, usernameNotFoundErrorMessage } = require('../helpers');
+const { comparePassword, usernameNotFoundErrorMessage, authenticationErrorMessage } = require('../helpers');
 const { authenticationError } = require('../errors');
 
 exports.validatePassword = (req, res, next) => {
@@ -16,8 +16,9 @@ exports.validatePassword = (req, res, next) => {
     .then(([arePasswordsEqual, user]) => {
       if (arePasswordsEqual) {
         req.locals = { ...req.locals, role: user.role };
-        next();
+        return next();
       }
+      return next(authenticationError(authenticationErrorMessage));
     })
     .catch(error => {
       logger.error(error);
