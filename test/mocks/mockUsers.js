@@ -7,6 +7,13 @@ exports.mockUser = {
   password: chance.word({ length: 8 }) + chance.integer({ min: 0, max: 9 })
 };
 
+exports.mockUserOnTheFly = () => ({
+  firstName: chance.first(),
+  lastName: chance.last(),
+  email: chance.email({ domain: 'wolox.com.ar' }),
+  password: chance.word({ length: 8 }) + chance.integer({ min: 0, max: 9 })
+});
+
 exports.passwordTooShortUser = {
   ...exports.mockUser,
   password: chance.word({ length: 2 }) + chance.integer({ min: 0, max: 9 })
