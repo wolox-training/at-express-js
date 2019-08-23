@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
         allowNull: false
+      },
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: 'regular'
       }
     },
     { underscored: true }
@@ -51,6 +55,9 @@ module.exports = (sequelize, DataTypes) => {
     User.create(user)
       .then(prepareResponse)
       .catch(handleError('Unable to create new user'));
+
+  User.createAdmin = user =>
+    User.upsert({ ...user, role: 'admin' }).catch(handleError('Unable to create admin'));
 
   User.findByEmail = email =>
     User.findOne({ where: { email } })
