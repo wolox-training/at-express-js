@@ -1,16 +1,12 @@
 const { User } = require('../models');
 const { notFoundError } = require('../errors');
 const { userNotFoundErrorMessage, getUserFields } = require('../helpers');
-const { port, host } = require('../../config').common.api;
-const { api } = require('../../config').common;
-const logger = require('../logger');
+const { port, host, pageSize } = require('../../config').common.api;
 
 exports.getAllUsers = (getPage = 1) => () => {
   const page = parseInt(getPage);
-  const offset = (page - 1) * api.pageSize;
-  const limit = parseInt(api.pageSize);
-  logger.info(api);
-  logger.info(api.pageSize);
+  const offset = (page - 1) * pageSize;
+  const limit = parseInt(pageSize);
 
   return User.getAll({ offset, limit }).then(response => {
     const areNext = offset + limit < response.count;

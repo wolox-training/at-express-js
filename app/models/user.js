@@ -57,13 +57,16 @@ module.exports = (sequelize, DataTypes) => {
       .then(prepareResponse)
       .catch(handleError('Unable to find user'));
 
-  User.getAll = ({ offset, limit }) =>
-    User.findAndCountAll({ offset, limit })
+  User.getAll = ({ offset, limit }) => {
+    logger.info(`offset ${offset}`);
+    logger.info(`limit ${limit}`);
+    return User.findAndCountAll({ offset, limit })
       .then(result => ({
         count: result.count,
         rows: prepareResponse(result.rows)
       }))
       .catch(handleError('Unable to get users'));
+  };
 
   return User;
 };
