@@ -26,7 +26,7 @@ exports.init = app => {
 
   app.post(
     '/admin/users',
-    [checkSchema(userSchema), getValidationErrors, validateToken, validatePermissions],
+    [checkSchema(userSchema), getValidationErrors, validateToken, validatePermissions(['admin'])],
     createAdmin
   );
 };

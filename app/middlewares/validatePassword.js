@@ -11,9 +11,14 @@ exports.validatePassword = (req, res, next) => {
       if (!user) {
         throw authenticationError(usernameNotFoundErrorMessage);
       }
-      return comparePassword({ user, password });
+      return Promise.all([comparePassword({ user, password }), user]);
     })
-    .then(() => next())
+    .then(([arePasswordsEqual, user]) => {
+      if (arePasswordsEqual) {
+        req.locals = { ...req.locals, role: user.role };
+        next();
+      }
+    })
     .catch(error => {
       logger.error(error);
       next(error);
