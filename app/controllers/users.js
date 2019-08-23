@@ -30,3 +30,23 @@ exports.getUsers = (req, res, next) => {
     .then(response => res.send(response))
     .catch(next);
 };
+
+exports.createAdmin = (req, res, next) => {
+  const { firstName, lastName, email, password } = req.body;
+  const userCreatedResponse = name => {
+    logger.info(`A user '${name}' has been created`);
+    res.status(201).end();
+  };
+  const userUpdatedResponse = name => {
+    logger.info(`A user '${name}' has been updated`);
+    res.end();
+  };
+
+  const setAdmin = hashedUser => User.createAdmin(hashedUser);
+  const respond = created => (created ? userCreatedResponse() : userUpdatedResponse());
+
+  return hashPassword({ firstName, lastName, email, password })
+    .then(setAdmin)
+    .then(respond)
+    .catch(next);
+};

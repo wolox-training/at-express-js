@@ -29,3 +29,6 @@ exports.authenticationError = message => internalError(message, exports.AUTHENTI
 
 exports.NOT_FOUND_ERROR = 'not_found_error';
 exports.notFoundError = message => internalError(message, exports.NOT_FOUND_ERROR);
+
+exports.FORBIDDEN_ERROR = 'forbidden_error';
+exports.forbiddenError = message => internalError(message, exports.FORBIDDEN_ERROR);
