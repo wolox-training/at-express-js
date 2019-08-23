@@ -7,7 +7,7 @@ exports.config = {
     },
     api: {
       host: process.env.TEST_HOST,
-      pageSize: process.env.PAGE_SIZE
+      pageSize: 10
     },
     token: {
       secret: 'some-super-secret'
