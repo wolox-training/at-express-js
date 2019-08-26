@@ -6,7 +6,7 @@ exports.validateToken = (req, res, next) => {
   const { authorization } = req.headers;
   try {
     const token = decodeToken(authorization);
-    req.locals = { ...req.locals, ...token };
+    req.locals = { ...req.locals, role: token.role };
     next();
   } catch (e) {
     logger.error(e);
