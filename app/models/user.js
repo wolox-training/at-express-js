@@ -2,9 +2,10 @@
 const logger = require('../logger');
 const { databaseError } = require('../errors');
 const { dbErrorCodes } = require('../helpers');
+const { extractField } = require('../serializers');
 
 const handleError = genericMessage => error => {
-  logger.error(error);
+  logger.error(error.message);
   const { message, errorFn } = dbErrorCodes[error.name] || { message: genericMessage };
   if (errorFn) {
     throw errorFn(`${genericMessage}. ${message}`);
@@ -13,12 +14,7 @@ const handleError = genericMessage => error => {
   throw databaseError(genericMessage);
 };
 
-const prepareResponse = response => {
-  if (Array.isArray(response)) {
-    return response.map(e => e.dataValues);
-  }
-  return response && response.dataValues;
-};
+const prepareResponse = extractField('dataValues');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -59,8 +55,8 @@ module.exports = (sequelize, DataTypes) => {
   User.createAdmin = user =>
     User.upsert({ ...user, role: 'admin' }).catch(handleError('Unable to create admin'));
 
-  User.findByEmail = email =>
-    User.findOne({ where: { email } })
+  User.findBy = query =>
+    User.findOne({ where: { ...query } })
       .then(prepareResponse)
       .catch(handleError('Unable to find user'));
 

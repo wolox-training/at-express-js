@@ -5,36 +5,27 @@ const request = supertest(app);
 const { User } = require('../app/models');
 const { mockUser, mockUserOnTheFly } = require('./mocks/mockUsers');
 const { FORBIDDEN_ERROR } = require('../app/errors');
+const { createToken } = require('../app/helpers');
+const { createUsers } = require('./helpers');
 
 describe('POST /admin/users', () => {
   it('should succeed when user has authorization (create new admin)', () =>
-    request
-      .post('/users')
-      .send(mockUser)
-      .then(() => User.update({ role: 'admin' }, { where: { email: mockUser.email } }))
-      .then(() =>
-        request.post('/users/sessions').send({ email: mockUser.email, password: mockUser.password })
-      )
+    createUsers(1)
+      .then(result => {
+        const token = createToken({ email: result[0].email, role: 'admin' });
+        return request
+          .post('/admin/users')
+          .send(mockUser)
+          .set({ authorization: token });
+      })
       .then(response => {
-        const user = mockUserOnTheFly();
-        const token = response.headers.authorization;
-        return Promise.all([
-          request
-            .post('/admin/users')
-            .send(user)
-            .set({ authorization: token }),
-          user,
-          token
-        ]);
-      })
-      .then(([response, user]) => {
         expect(response.statusCode).to.equal(201);
-        return Promise.all([User.find({ where: { email: user.email } }), user]);
+        return User.find({ where: { email: mockUser.email } });
       })
-      .then(([response, user]) => {
-        expect(response.firstName).to.equal(user.firstName);
-        expect(response.lastName).to.equal(user.lastName);
-        expect(response.email).to.equal(user.email);
+      .then(response => {
+        expect(response.firstName).to.equal(mockUser.firstName);
+        expect(response.lastName).to.equal(mockUser.lastName);
+        expect(response.email).to.equal(mockUser.email);
         expect(response.role).to.equal('admin');
       }));
 

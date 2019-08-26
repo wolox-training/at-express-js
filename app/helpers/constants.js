@@ -12,4 +12,5 @@ exports.invalidPasswordLengthMessage = `Password must be at least ${exports.MIN_
 exports.invalidEmailDomainMessage = `The email must be @${exports.EMAIL_DOMAIN}`;
 exports.authenticationErrorMessage = 'Unable to authenticate credentials';
 exports.usernameNotFoundErrorMessage = 'Username not found';
-exports.userNotFoundErrorMessage = 'Te user you are looking for was not found';
+exports.MISSING_FIELD = 'missing_field';
+exports.userNotFoundErrorMessage = 'The user you are looking for was not found';

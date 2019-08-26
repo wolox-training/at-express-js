@@ -1,7 +1,9 @@
 const logger = require('../logger');
 const { User } = require('../models');
 const { hashPassword, createToken } = require('../helpers');
-const { getAllUsers, getUserByEmail } = require('../services/usersService');
+const { getAllUsers, getUserById } = require('../services/usersService');
+const { comparePassword, usernameNotFoundErrorMessage, authenticationErrorMessage } = require('../helpers');
+const { authenticationError } = require('../errors');
 
 exports.signUp = (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -17,16 +19,34 @@ exports.signUp = (req, res, next) => {
     });
 };
 
-exports.signIn = (req, res) => {
-  const token = createToken({ email: req.body.email, role: req.locals.role });
-  res.set('authorization', token).end();
+exports.signIn = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findBy({ email })
+    .then(user => {
+      if (!user) {
+        throw authenticationError(usernameNotFoundErrorMessage);
+      }
+      return Promise.all([comparePassword({ user, password }), user]);
+    })
+    .then(([arePasswordEql, user]) => {
+      if (!arePasswordEql) {
+        throw authenticationError(authenticationErrorMessage);
+      }
+      const token = createToken({ email: user.email, role: user.role });
+      res.set('authorization', token).end();
+    })
+    .catch(error => {
+      logger.error(error);
+      next(error);
+    });
 };
 
 exports.getUsers = (req, res, next) => {
-  const { email } = req.params;
-  const { page } = req.query;
-  const selectGetFn = email ? getUserByEmail : getAllUsers(page);
-  return selectGetFn(email)
+  const { id } = req.params;
+  const { page, pageSize } = req.query;
+  const selectGetFn = id ? getUserById : getAllUsers(page, pageSize);
+  return selectGetFn(id)
     .then(response => res.send(response))
     .catch(next);
 };
