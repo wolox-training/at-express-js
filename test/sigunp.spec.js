@@ -8,7 +8,8 @@ const {
   invalidPasswordLengthMessage,
   invalidPasswordMessage,
   invalidEmailDomainMessage,
-  missingRequiredFieldsMessage
+  missingRequiredFieldsMessage,
+  EMAIL_DOMAIN
 } = require('../app/helpers');
 const {
   mockUser,
@@ -75,7 +76,7 @@ describe('POST /users', () => {
         expect(response.statusCode).to.equal(422);
       }));
 
-  it('should fail because email is not @wolox.com.ar', () =>
+  it(`should fail because email is not ${EMAIL_DOMAIN}`, () =>
     request
       .post('/users')
       .send(wrongDomainUser)

@@ -3,6 +3,7 @@ const { userSchema } = require('../schemas/userSchema');
 const { dbErrorCodes } = require('./dbErrorCodes');
 const { createToken, decodeToken } = require('./token');
 const CONSTANTS = require('./constants');
+const { matchInArray } = require('./operations');
 
 const getUserFields = result => {
   const fields = Object.keys(userSchema).filter(field => field !== 'password');
@@ -22,5 +23,6 @@ module.exports = {
   createToken,
   decodeToken,
   getUserFields,
-  ...CONSTANTS
+  ...CONSTANTS,
+  matchInArray
 };

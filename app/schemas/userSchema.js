@@ -4,28 +4,30 @@ const {
   MIN_LENGTH,
   invalidPasswordMessage,
   invalidPasswordLengthMessage,
-  invalidEmailDomainMessage
+  invalidEmailDomainMessage,
+  MISSING_FIELD,
+  matchInArray
 } = require('../helpers/constants');
 
 exports.userSchema = {
   firstName: {
     in: ['body'],
     isEmpty: {
-      errorMessage: 'missing_field',
+      errorMessage: MISSING_FIELD,
       negated: true
     }
   },
   lastName: {
     in: ['body'],
     isEmpty: {
-      errorMessage: 'missing_field',
+      errorMessage: MISSING_FIELD,
       negated: true
     }
   },
   email: {
     in: ['body'],
     isEmpty: {
-      errorMessage: 'missing_field',
+      errorMessage: MISSING_FIELD,
       negated: true
     },
     isEmail: {
@@ -39,17 +41,11 @@ exports.userSchema = {
   password: {
     in: ['body'],
     isEmpty: {
-      errorMessage: 'missing_field',
+      errorMessage: MISSING_FIELD,
       negated: true
     },
     custom: {
-      options: value =>
-        PASSWORD_FORMATS.reduce((result, format) => {
-          if (!value.match(format)) {
-            return false;
-          }
-          return result;
-        }, true),
+      options: value => matchInArray(PASSWORD_FORMATS, value),
       errorMessage: invalidPasswordMessage
     },
     isLength: {

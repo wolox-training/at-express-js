@@ -1,51 +1,42 @@
 const chance = require('chance')();
-
-const mockUser = {
-  firstName: chance.first(),
-  lastName: chance.last(),
-  email: chance.email({ domain: 'wolox.com.ar' }),
-  password: chance.word({ length: 8 }) + chance.integer({ min: 0, max: 9 })
-};
-
-const loggingUser = {
-  email: mockUser.email,
-  password: mockUser.password
-};
+const { mockUser, wrongFormatPasswordUser, wrongDomainUser, passwordTooShortUser } = require('./mockUsers');
+const { EMAIL_DOMAIN } = require('../../app/helpers');
+const { email, password } = mockUser;
 
 exports.wrongPasswordUser = {
-  ...loggingUser,
+  email,
   password: chance.integer({ min: 0, max: 9 }) + chance.word({ length: 8 })
 };
 
 exports.unexistentUserNameUser = {
-  ...loggingUser,
-  email: chance.email({ domain: 'wolox.com.ar' })
+  email: chance.email({ domain: EMAIL_DOMAIN }),
+  password
 };
 
 exports.missingPasswordUser = {
-  ...loggingUser,
+  email,
   password: null
 };
 
 exports.missignEmailUser = {
-  ...loggingUser,
-  email: null
+  email: null,
+  password
 };
 
 exports.wrongDomainUser = {
-  ...loggingUser,
-  email: chance.email({ domain: 'different.com.ar' })
+  email: wrongDomainUser.email,
+  password
 };
 
 exports.passwordTooShortUser = {
-  ...loggingUser,
-  password: chance.word({ length: 2 }) + chance.integer({ min: 0, max: 9 })
+  email,
+  password: passwordTooShortUser.password
 };
 
 exports.wrongFormatPasswordUser = {
-  ...loggingUser,
-  password: chance.word({ length: 10 })
+  email,
+  password: wrongFormatPasswordUser.password
 };
 
 exports.mockUser = mockUser;
-exports.loggingUser = loggingUser;
+exports.loggingUser = { email, password };
