@@ -41,8 +41,8 @@ module.exports = (sequelize, DataTypes) => {
       throw databaseError('Unable to create new user.');
     });
 
-  User.findByEmail = email =>
-    User.findOne({ where: { email } })
+  User.findBy = query =>
+    User.findOne({ where: { ...query } })
       .then(response => response && response.dataValues)
       .catch(error => {
         logger.error(error);

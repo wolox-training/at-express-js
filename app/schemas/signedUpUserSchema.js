@@ -4,14 +4,16 @@ const {
   MIN_LENGTH,
   invalidEmailDomainMessage,
   invalidPasswordMessage,
-  invalidPasswordLengthMessage
+  invalidPasswordLengthMessage,
+  MISSING_FIELD,
+  matchInArray
 } = require('../helpers');
 
 exports.signedUpUserSchema = {
   email: {
     in: ['body'],
     isEmpty: {
-      errorMessage: 'missing_field',
+      errorMessage: MISSING_FIELD,
       negated: true
     },
     isEmail: {
@@ -25,17 +27,11 @@ exports.signedUpUserSchema = {
   password: {
     in: ['body'],
     isEmpty: {
-      errorMessage: 'missing_field',
+      errorMessage: MISSING_FIELD,
       negated: true
     },
     custom: {
-      options: value =>
-        PASSWORD_FORMATS.reduce((result, format) => {
-          if (!value.match(format)) {
-            return false;
-          }
-          return result;
-        }, true),
+      options: value => matchInArray(PASSWORD_FORMATS, value),
       errorMessage: invalidPasswordMessage
     },
     isLength: {

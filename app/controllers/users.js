@@ -1,6 +1,8 @@
 const logger = require('../logger');
 const { User } = require('../models');
 const { hashPassword, createToken } = require('../helpers');
+const { comparePassword, usernameNotFoundErrorMessage, authenticationErrorMessage } = require('../helpers');
+const { authenticationError } = require('../errors');
 
 exports.signUp = (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -16,7 +18,25 @@ exports.signUp = (req, res, next) => {
     });
 };
 
-exports.signIn = (req, res) => {
-  const token = createToken(req.body.email);
-  res.set('authorization', token).end();
+exports.signIn = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findBy({ email })
+    .then(user => {
+      if (!user) {
+        throw authenticationError(usernameNotFoundErrorMessage);
+      }
+      return comparePassword({ user, password });
+    })
+    .then(arePasswordEql => {
+      if (!arePasswordEql) {
+        throw authenticationError(authenticationErrorMessage);
+      }
+      const token = createToken(req.body.email);
+      res.set('authorization', token).end();
+    })
+    .catch(error => {
+      logger.error(error);
+      next(error);
+    });
 };
