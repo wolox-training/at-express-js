@@ -7,7 +7,7 @@ const {
   invalidEmailDomainMessage,
   MISSING_FIELD,
   matchInArray
-} = require('../helpers/constants');
+} = require('../helpers');
 
 exports.userSchema = {
   firstName: {

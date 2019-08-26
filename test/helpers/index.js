@@ -1,7 +1,6 @@
 const chance = require('chance')();
-const supertest = require('supertest');
-const app = require('../../app');
-const request = supertest(app);
+const { User } = require('../../app/models');
+const { hashPassword } = require('../../app/helpers');
 
 exports.createUsers = count => {
   const createRequestArray = (arr, counting) => {
@@ -12,10 +11,12 @@ exports.createUsers = count => {
       password: '1234587ocho'
     };
 
+    const userPromise = hashPassword(mockUser).then(User.createUser);
+
     if (counting === 1) {
-      return [...arr, request.post('/users').send(mockUser)];
+      return [...arr, userPromise];
     }
-    return createRequestArray([...arr, request.post('/users').send(mockUser)], counting - 1);
+    return createRequestArray([...arr, userPromise], counting - 1);
   };
 
   const promises = createRequestArray([], count);

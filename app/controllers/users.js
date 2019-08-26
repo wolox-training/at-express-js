@@ -1,7 +1,7 @@
 const logger = require('../logger');
 const { User } = require('../models');
 const { hashPassword, createToken } = require('../helpers');
-const { getAllUsers, getUserByEmail } = require('../services/usersService');
+const { getAllUsers, getUserById } = require('../services/usersService');
 const { comparePassword, usernameNotFoundErrorMessage, authenticationErrorMessage } = require('../helpers');
 const { authenticationError } = require('../errors');
 
@@ -43,10 +43,10 @@ exports.signIn = (req, res, next) => {
 };
 
 exports.getUsers = (req, res, next) => {
-  const { email } = req.params;
-  const { page } = req.query;
-  const selectGetFn = email ? getUserByEmail : getAllUsers(page);
-  return selectGetFn(email)
+  const { id } = req.params;
+  const { page, pageSize } = req.query;
+  const selectGetFn = id ? getUserById : getAllUsers(page, pageSize);
+  return selectGetFn(id)
     .then(response => res.send(response))
     .catch(next);
 };

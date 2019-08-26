@@ -14,7 +14,7 @@ exports.init = app => {
   app.get('/albums/:id/photos', getPhotos);
 
   app.get('/users', validateToken, getUsers);
-  app.get('/users/:email', validateToken, getUsers);
+  app.get('/users/:id', validateToken, getUsers);
   app.post('/users', [checkSchema(userSchema), getValidationErrors], signUp);
   app.post('/users/sessions', [checkSchema(signedUpUserSchema), getValidationErrors], signIn);
 };

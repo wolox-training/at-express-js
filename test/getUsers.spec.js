@@ -5,45 +5,52 @@ const request = supertest(app);
 const { createUsers } = require('./helpers');
 const { host, port } = require('../config').common.api;
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
+const { createToken } = require('../app/helpers');
+
+const expected = {
+  count: 25,
+  status: 200,
+  resultLength: 10,
+  prev: null,
+  next: null
+};
+
+const getNextRequest = (page, token) => request.get(`/users?page=${page}`).set({ authorization: token });
+
+const checkResponse = (response, expectedValues) => {
+  expect(response.statusCode).to.equal(expectedValues.status);
+  expect(response.body.count).to.equal(expectedValues.count);
+  expect(response.body.result.length).to.equal(expectedValues.resultLength);
+  expect(response.body.prev).to.equal(expectedValues.prev);
+  expect(response.body.next).to.equal(expectedValues.next);
+};
 
 describe('GET /users', () => {
   it('should success when user is logged in', () =>
     createUsers(25)
-      .then(() =>
-        request.post('/users/sessions').send({ email: 'mail1@wolox.com.ar', password: '1234587ocho' })
-      )
-      .then(response => {
-        const token = response.headers.authorization;
+      .then(() => {
+        const token = createToken({ email: 'mail1@wolox.com.ar' });
         const nextRequest = request.get('/users').set({ authorization: token });
         return Promise.all([nextRequest, token]);
       })
       .then(([response, token]) => {
-        const { count, result, prev, next } = response.body;
-        expect(response.statusCode).to.equal(200);
-        expect(count).to.equal(25);
-        expect(result.length).to.equal(10);
-        expect(prev).to.equal(null);
-        expect(next).to.equal(`${host}:${port}/users?page=2`);
-        const nextRequest = request.get('/users?page=2').set({ authorization: token });
-        return Promise.all([nextRequest, token]);
+        checkResponse(response, { ...expected, next: `${host}:${port}/users?page=2` });
+        return Promise.all([getNextRequest(2, token), token]);
       })
       .then(([response, token]) => {
-        const { count, result, prev, next } = response.body;
-        expect(response.statusCode).to.equal(200);
-        expect(count).to.equal(25);
-        expect(result.length).to.equal(10);
-        expect(prev).to.equal(`${host}:${port}/users?page=1`);
-        expect(next).to.equal(`${host}:${port}/users?page=3`);
-
-        return request.get('/users?page=3').set({ authorization: token });
+        checkResponse(response, {
+          ...expected,
+          next: `${host}:${port}/users?page=3`,
+          prev: `${host}:${port}/users?page=1`
+        });
+        return getNextRequest(3, token);
       })
       .then(response => {
-        const { count, result, prev, next } = response.body;
-        expect(response.statusCode).to.equal(200);
-        expect(count).to.equal(25);
-        expect(result.length).to.equal(5);
-        expect(prev).to.equal(`${host}:${port}/users?page=2`);
-        expect(next).to.equal(null);
+        checkResponse(response, {
+          ...expected,
+          resultLength: 5,
+          prev: `${host}:${port}/users?page=2`
+        });
       }));
 
   it('should fail because user is not authenticated', () =>
@@ -56,15 +63,12 @@ describe('GET /users', () => {
       }));
 });
 
-describe('GET /users/:email', () => {
+describe('GET /users/:id', () => {
   it('should success when user is logged in', () =>
-    createUsers(25)
-      .then(() =>
-        request.post('/users/sessions').send({ email: 'mail1@wolox.com.ar', password: '1234587ocho' })
-      )
-      .then(response => {
-        const token = response.headers.authorization;
-        return request.get('/users/mail2@wolox.com.ar').set({ authorization: token });
+    createUsers(2)
+      .then(result => {
+        const token = createToken({ email: result[0].email });
+        return request.get(`/users/${result[1].id}`).set({ authorization: token });
       })
       .then(response => {
         expect(response.statusCode).to.equal(200);
@@ -84,12 +88,9 @@ describe('GET /users/:email', () => {
 
   it('should fail because user requested does not exist', () =>
     createUsers(1)
-      .then(() =>
-        request.post('/users/sessions').send({ email: 'mail1@wolox.com.ar', password: '1234587ocho' })
-      )
-      .then(response => {
-        const token = response.headers.authorization;
-        return request.get('/users/mail2@wolox.com.ar').set({ authorization: token });
+      .then(result => {
+        const token = createToken({ email: result[0].id });
+        return request.get('/users/9999').set({ authorization: token });
       })
       .then(response => {
         expect(response.statusCode).to.equal(404);
