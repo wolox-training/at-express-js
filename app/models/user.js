@@ -1,20 +1,6 @@
 'use strict';
-const logger = require('../logger');
-const { databaseError } = require('../errors');
-const { dbErrorCodes, REGULAR_ROLE, ADMIN_ROLE } = require('../helpers');
-const { extractField } = require('../serializers');
-
-const handleError = genericMessage => error => {
-  logger.error(error.message);
-  const { message, errorFn } = dbErrorCodes[error.name] || { message: genericMessage };
-  if (errorFn) {
-    throw errorFn(`${genericMessage}. ${message}`);
-  }
-  logger.error(message);
-  throw databaseError(genericMessage);
-};
-
-const prepareResponse = extractField('dataValues');
+const { REGULAR_ROLE, ADMIN_ROLE } = require('../helpers');
+const { handleError, prepareResponse } = require('../helpers/modelHelpers');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
