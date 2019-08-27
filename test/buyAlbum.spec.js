@@ -39,7 +39,7 @@ describe('POST /albums/:id', () => {
       }));
 
   it('should fail because album does not exists in provider', () => {
-    notFoundAlbum();
+    notFoundAlbum(albumId);
     return request
       .post(`/albums/${albumId}`)
       .send({})

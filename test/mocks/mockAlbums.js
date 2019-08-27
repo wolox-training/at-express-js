@@ -10,7 +10,7 @@ exports.getAlbum = albumId =>
       title: 'quidem molestiae enim'
     });
 
-exports.notFoundAlbum = () =>
+exports.notFoundAlbum = albumId =>
   nock(albumsEndpoint)
-    .get('/')
+    .get(`/${albumId}`)
     .reply(404);
