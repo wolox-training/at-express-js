@@ -4,7 +4,7 @@ const { dbErrorCodes } = require('./index');
 const { extractField } = require('../serializers');
 
 exports.handleError = genericMessage => error => {
-  logger.error(error.message);
+  logger.error(error);
   const { message, errorFn } = dbErrorCodes[error.name] || { message: genericMessage };
   if (errorFn) {
     throw errorFn(`${genericMessage}. ${message}`);

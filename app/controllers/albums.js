@@ -17,12 +17,10 @@ exports.getPhotos = (req, res, next) => {
 };
 
 exports.buyAlbum = (req, res, next) => {
-  const { email } = req.locals;
+  const { userId } = req.locals;
   const { id } = req.params;
   return getAlbumById(id)
-    .then(album => createAlbum(album, email))
-    .then(response => {
-      res.send(response);
-    })
+    .then(createAlbum(userId))
+    .then(() => res.status(201).end())
     .catch(next);
 };

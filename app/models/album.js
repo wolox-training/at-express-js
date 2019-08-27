@@ -19,10 +19,11 @@ module.exports = (sequelize, DataTypes) => {
     { underscored: true }
   );
 
-  Album.createUser = user =>
-    Album.create(user)
+  Album.createAlbum = (albumId, userId) =>
+    Album.create({ albumId, userId })
       .then(prepareResponse)
       .catch(handleError('Unable to create new album'));
 
+  Album.removeAttribute('id');
   return Album;
 };
