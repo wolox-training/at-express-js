@@ -1,24 +1,14 @@
-const chance = require('chance')();
+const { factory } = require('factory-girl');
 const { User } = require('../../app/models');
 const { hashPassword } = require('../../app/helpers');
+const { EMAIL_DOMAIN } = require('../../app/helpers');
+const { extractField } = require('../../app/serializers');
 
-exports.createUsers = count => {
-  const createRequestArray = (arr, counting) => {
-    const mockUser = {
-      firstName: chance.first(),
-      lastName: chance.last(),
-      email: `mail${counting}@wolox.com.ar`,
-      password: '1234587ocho'
-    };
+factory.define('user', User, {
+  firstName: factory.chance('first'),
+  lastName: factory.chance('last'),
+  email: factory.seq('User.email', n => `mail-${n}@${EMAIL_DOMAIN}`),
+  password: () => hashPassword({ password: '1234567ocho' }).then(hashed => hashed.password)
+});
 
-    const userPromise = hashPassword(mockUser).then(User.createUser);
-
-    if (counting === 1) {
-      return [...arr, userPromise];
-    }
-    return createRequestArray([...arr, userPromise], counting - 1);
-  };
-
-  const promises = createRequestArray([], count);
-  return Promise.all(promises);
-};
+exports.createUsers = count => factory.createMany('user', count).then(extractField('dataValues'));
