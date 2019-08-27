@@ -29,6 +29,26 @@ describe('POST /admin/users', () => {
         expect(response.role).to.equal(ADMIN_ROLE);
       }));
 
+  it('should succeed when user has authorization (update existing user)', () =>
+    createUsers(2)
+      .then(([user, userToUpdate]) => {
+        const token = createToken({ email: user.email, role: ADMIN_ROLE });
+        return Promise.all([
+          request
+            .post('/admin/users')
+            .send({ ...mockUser, email: userToUpdate.email })
+            .set({ authorization: token }),
+          userToUpdate
+        ]);
+      })
+      .then(([response, userToUpdate]) => {
+        expect(response.statusCode).to.equal(200);
+        return User.find({ where: { email: userToUpdate.email } });
+      })
+      .then(response => {
+        expect(response.role).to.equal(ADMIN_ROLE);
+      }));
+
   it('should fail because user is not authorized', () =>
     createUsers(1)
       .then(result =>
