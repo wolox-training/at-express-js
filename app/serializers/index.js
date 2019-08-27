@@ -30,3 +30,9 @@ exports.paginatedResponse = ({ resource, offset, limit, page }) => response => {
     next: nextExists ? `${host}:${port}/${resource}?page=${page + 1}` : null
   };
 };
+
+exports.createURIsList = (list, resource, fields) =>
+  list.map(item => {
+    const listItem = fields ? fields.reduce((obj, field) => ({ ...obj, field: item[field] }), {}) : item;
+    return { ...listItem, uri: `${host}:${port}/${resource}/${item.id}` };
+  });

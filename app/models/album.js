@@ -24,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
       .then(prepareResponse)
       .catch(handleError('Unable to create new album'));
 
+  Album.findBy = query =>
+    Album.find({ where: { ...query } })
+      .then(prepareResponse)
+      .catch(handleError('Unable to find albums'));
+
   Album.removeAttribute('id');
   return Album;
 };

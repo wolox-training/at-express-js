@@ -1,7 +1,13 @@
 const { getAllAlbums, getAlbumById, getPhotosByAlbum } = require('../services/externalServices');
-const { createAlbum } = require('../services/albumsService');
+const { createAlbum, getUserAlbums } = require('../services/albumsService');
+const { createURIsList } = require('../serializers');
 
 exports.getAlbums = (req, res, next) => {
+  const { userId } = req.params;
+  if (userId) {
+    return getUserAlbums(userId).then(createURIsList);
+  }
+
   const albumId = req.params.id;
   const selectGetFn = albumId ? getAlbumById : getAllAlbums;
   return selectGetFn(albumId)
