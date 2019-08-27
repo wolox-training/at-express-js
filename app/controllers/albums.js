@@ -19,7 +19,7 @@ exports.getPhotos = (req, res, next) => {
 exports.buyAlbum = (req, res, next) => {
   const { userId } = req.locals;
   const { id } = req.params;
-  return getAlbumById(id)
+  return getAlbumById(parseInt(id))
     .then(createAlbum(userId))
     .then(() => res.status(201).end())
     .catch(next);
