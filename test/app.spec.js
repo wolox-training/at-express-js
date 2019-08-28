@@ -1,5 +1,4 @@
 'use strict';
-
 const fs = require('fs'),
   models = require('../app/models'),
   path = require('path');

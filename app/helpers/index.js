@@ -1,11 +1,12 @@
-const { userSchema } = require('../schemas/userSchema');
-const { hashPassword } = require('./encryption');
 const { dbErrorCodes } = require('./dbErrorCodes');
+const { createToken, decodeToken } = require('./token');
 const CONSTANTS = require('./constants');
+const { matchInArray } = require('./operations');
 
 module.exports = {
-  hashPassword,
   dbErrorCodes,
-  userSchema,
-  ...CONSTANTS
+  createToken,
+  decodeToken,
+  ...CONSTANTS,
+  matchInArray
 };

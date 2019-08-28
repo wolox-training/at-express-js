@@ -2,28 +2,14 @@ const {
   EMAIL_DOMAIN,
   PASSWORD_FORMATS,
   MIN_LENGTH,
+  invalidEmailDomainMessage,
   invalidPasswordMessage,
   invalidPasswordLengthMessage,
-  invalidEmailDomainMessage,
   MISSING_FIELD,
   matchInArray
 } = require('../helpers');
 
-exports.userSchema = {
-  firstName: {
-    in: ['body'],
-    isEmpty: {
-      errorMessage: MISSING_FIELD,
-      negated: true
-    }
-  },
-  lastName: {
-    in: ['body'],
-    isEmpty: {
-      errorMessage: MISSING_FIELD,
-      negated: true
-    }
-  },
+exports.signedUpUserSchema = {
   email: {
     in: ['body'],
     isEmpty: {

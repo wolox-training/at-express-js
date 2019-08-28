@@ -7,8 +7,9 @@ const {
   alreadyExistsErrorMessage,
   invalidPasswordLengthMessage,
   invalidPasswordMessage,
-  invalidEmailDomain,
-  missingRequiredFieldsMessage
+  invalidEmailDomainMessage,
+  missingRequiredFieldsMessage,
+  EMAIL_DOMAIN
 } = require('../app/helpers');
 const {
   mockUser,
@@ -55,7 +56,7 @@ describe('POST /users', () => {
         expect(response.statusCode).to.equal(422);
       }));
 
-  it('should fail because password is badly formatted (too short)', () => {
+  it('should fail because password is badly formatted (too short)', () =>
     request
       .post('/users')
       .send(passwordTooShortUser)
@@ -63,8 +64,7 @@ describe('POST /users', () => {
         expect(response.body.message).to.include(invalidPasswordLengthMessage);
         expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
         expect(response.statusCode).to.equal(422);
-      });
-  });
+      }));
 
   it('should fail because password is badly formatted (not containing letters and numbers)', () =>
     request
@@ -76,12 +76,12 @@ describe('POST /users', () => {
         expect(response.statusCode).to.equal(422);
       }));
 
-  it('should fail because email is not @wolox.com.ar', () =>
+  it(`should fail because email is not ${EMAIL_DOMAIN}`, () =>
     request
       .post('/users')
       .send(wrongDomainUser)
       .then(response => {
-        expect(response.body.message).to.include(invalidEmailDomain);
+        expect(response.body.message).to.include(invalidEmailDomainMessage);
         expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
         expect(response.statusCode).to.equal(422);
       }));

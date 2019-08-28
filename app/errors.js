@@ -23,3 +23,12 @@ exports.missingDataError = message => internalError(message, exports.MISSING_DAT
 
 exports.ENCRYPTION_ERROR = 'encryption_error';
 exports.encryptionError = message => internalError(message, exports.ENCRYPTION_ERROR);
+
+exports.AUTHENTICATION_ERROR = 'authentication_error';
+exports.authenticationError = message => internalError(message, exports.AUTHENTICATION_ERROR);
+
+exports.NOT_FOUND_ERROR = 'not_found_error';
+exports.notFoundError = message => internalError(message, exports.NOT_FOUND_ERROR);
+
+exports.FORBIDDEN_ERROR = 'forbidden_error';
+exports.forbiddenError = message => internalError(message, exports.FORBIDDEN_ERROR);

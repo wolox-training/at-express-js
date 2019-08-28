@@ -42,6 +42,9 @@ const config = {
       albumsEndpoint: process.env.EXTERNAL_API_ALBUMS,
       photosEndpoint: process.env.EXTERNAL_API_PHOTOS
     },
+    token: {
+      secret: process.env.TOKEN_SECRET
+    },
     session: {
       header_name: 'authorization',
       secret: process.env.NODE_API_SESSION_SECRET
