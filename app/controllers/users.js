@@ -2,11 +2,15 @@ const logger = require('../logger');
 const { User } = require('../models');
 const { hashPassword, createToken } = require('../helpers');
 const { comparePassword, usernameNotFoundErrorMessage, authenticationErrorMessage } = require('../helpers');
-const { authenticationError } = require('../errors');
+const { authenticationError, encryptionError } = require('../errors');
 
 exports.signUp = (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
   return hashPassword({ firstName, lastName, email, password })
+    .catch(error => {
+      logger.error(error.message);
+      throw encryptionError(error.message);
+    })
     .then(hashedUser => User.createUser(hashedUser))
     .then(result => {
       logger.info(`A user '${result.dataValues.firstName}' has been created`);
