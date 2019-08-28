@@ -31,13 +31,13 @@ exports.signIn = (req, res, next) => {
       if (!user) {
         throw authenticationError(usernameNotFoundErrorMessage);
       }
-      return comparePassword({ user, password });
+      return Promise.all([comparePassword({ user, password }), user]);
     })
-    .then(arePasswordEql => {
+    .then(([arePasswordEql, user]) => {
       if (!arePasswordEql) {
         throw authenticationError(authenticationErrorMessage);
       }
-      const token = createToken(req.body.email);
+      const token = createToken({ email: user.email, role: user.role });
       res.set('authorization', token).end();
     })
     .catch(error => {
@@ -52,5 +52,25 @@ exports.getUsers = (req, res, next) => {
   const selectGetFn = id ? getUserById : getAllUsers(page, pageSize);
   return selectGetFn(id)
     .then(response => res.send(response))
+    .catch(next);
+};
+
+exports.createAdmin = (req, res, next) => {
+  const { firstName, lastName, email, password } = req.body;
+  const userCreatedResponse = name => {
+    logger.info(`A user '${name}' has been created`);
+    res.status(201).end();
+  };
+  const userUpdatedResponse = name => {
+    logger.info(`A user '${name}' has been updated`);
+    res.end();
+  };
+
+  const setAdmin = hashedUser => User.createAdmin(hashedUser);
+  const respond = created => (created ? userCreatedResponse() : userUpdatedResponse());
+
+  return hashPassword({ firstName, lastName, email, password })
+    .then(setAdmin)
+    .then(respond)
     .catch(next);
 };

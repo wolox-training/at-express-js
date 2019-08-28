@@ -5,7 +5,8 @@ const { authenticationError } = require('../errors');
 exports.validateToken = (req, res, next) => {
   const { authorization } = req.headers;
   try {
-    decodeToken(authorization);
+    const token = decodeToken(authorization);
+    req.locals = { ...req.locals, role: token.role };
     next();
   } catch (e) {
     logger.error(e);

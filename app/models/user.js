@@ -1,7 +1,7 @@
 'use strict';
 const logger = require('../logger');
 const { databaseError } = require('../errors');
-const { dbErrorCodes } = require('../helpers');
+const { dbErrorCodes, REGULAR_ROLE, ADMIN_ROLE } = require('../helpers');
 const { extractField } = require('../serializers');
 
 const handleError = genericMessage => error => {
@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
         allowNull: false
+      },
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: REGULAR_ROLE
       }
     },
     { underscored: true }
@@ -47,6 +51,9 @@ module.exports = (sequelize, DataTypes) => {
     User.create(user)
       .then(prepareResponse)
       .catch(handleError('Unable to create new user'));
+
+  User.createAdmin = user =>
+    User.upsert({ ...user, role: ADMIN_ROLE }).catch(handleError(`Unable to create ${ADMIN_ROLE} user`));
 
   User.findBy = query =>
     User.findOne({ where: { ...query } })
