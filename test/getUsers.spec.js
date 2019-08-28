@@ -2,10 +2,9 @@ const supertest = require('supertest');
 const { expect } = require('chai');
 const app = require('../app');
 const request = supertest(app);
-const { createUsers } = require('./helpers');
+const { createUsers, authorizationFactory } = require('./helpers');
 const { host, port } = require('../config').common.api;
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
-const { createToken } = require('../app/helpers');
 
 const expected = {
   count: 25,
@@ -15,7 +14,7 @@ const expected = {
   next: null
 };
 
-const getNextRequest = (page, token) => request.get(`/users?page=${page}`).set({ authorization: token });
+const getNextRequest = page => request.get(`/users?page=${page}`).set(authorizationFactory.regular(1));
 
 const checkResponse = (response, expectedValues) => {
   expect(response.statusCode).to.equal(expectedValues.status);
@@ -28,22 +27,18 @@ const checkResponse = (response, expectedValues) => {
 describe('GET /users', () => {
   it('should success when user is logged in', () =>
     createUsers(25)
-      .then(() => {
-        const token = createToken({ email: 'mail1@wolox.com.ar' });
-        const nextRequest = request.get('/users').set({ authorization: token });
-        return Promise.all([nextRequest, token]);
-      })
-      .then(([response, token]) => {
+      .then(() => request.get('/users').set(authorizationFactory.regular(1)))
+      .then(response => {
         checkResponse(response, { ...expected, next: `${host}:${port}/users?page=2` });
-        return Promise.all([getNextRequest(2, token), token]);
+        return getNextRequest(2);
       })
-      .then(([response, token]) => {
+      .then(response => {
         checkResponse(response, {
           ...expected,
           next: `${host}:${port}/users?page=3`,
           prev: `${host}:${port}/users?page=1`
         });
-        return getNextRequest(3, token);
+        return getNextRequest(3);
       })
       .then(response => {
         checkResponse(response, {
@@ -56,7 +51,7 @@ describe('GET /users', () => {
   it('should fail because user is not authenticated', () =>
     request
       .get('/users')
-      .set({ authorization: 'something wrong' })
+      .set(authorizationFactory.invalid)
       .then(response => {
         expect(response.statusCode).to.equal(401);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
@@ -66,10 +61,7 @@ describe('GET /users', () => {
 describe('GET /users/:id', () => {
   it('should success when user is logged in', () =>
     createUsers(2)
-      .then(result => {
-        const token = createToken({ email: result[0].email });
-        return request.get(`/users/${result[1].id}`).set({ authorization: token });
-      })
+      .then(result => request.get(`/users/${result[1].id}`).set(authorizationFactory.regular(result[0].id)))
       .then(response => {
         expect(response.statusCode).to.equal(200);
         expect(response.body).to.have.property('firstName');
@@ -80,7 +72,7 @@ describe('GET /users/:id', () => {
   it('should fail because user is not authenticated', () =>
     request
       .get('/users/mail2@wolox.com.ar')
-      .set({ authorization: 'something wrong' })
+      .set(authorizationFactory.invalid)
       .then(response => {
         expect(response.statusCode).to.equal(401);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
@@ -88,10 +80,7 @@ describe('GET /users/:id', () => {
 
   it('should fail because user requested does not exist', () =>
     createUsers(1)
-      .then(result => {
-        const token = createToken({ email: result[0].id });
-        return request.get('/users/9999').set({ authorization: token });
-      })
+      .then(result => request.get('/users/9999').set(authorizationFactory.regular(result[0].id)))
       .then(response => {
         expect(response.statusCode).to.equal(404);
         expect(response.body.internal_code).to.equal(NOT_FOUND_ERROR);

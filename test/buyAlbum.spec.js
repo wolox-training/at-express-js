@@ -2,14 +2,13 @@ const supertest = require('supertest');
 const { expect } = require('chai');
 const app = require('../app');
 const request = supertest(app);
-const { createToken } = require('../app/helpers');
 const { getAlbum, notFoundAlbum } = require('./mocks/mockAlbums');
+const { authorizationFactory } = require('./helpers');
 const { AUTHENTICATION_ERROR, EXTERNAL_API_ERROR, ENTITY_ALREADY_EXISTS } = require('../app/errors');
-const { REGULAR_ROLE } = require('../app/helpers');
 const { Album } = require('../app/models');
 const albumId = 1;
 const userId = 15;
-const token = createToken({ userId, role: REGULAR_ROLE });
+const authorization = authorizationFactory.regular(userId);
 
 describe('POST /albums/:id', () => {
   it('should succeed when user is authenticated and has not bought the album already', () => {
@@ -17,7 +16,7 @@ describe('POST /albums/:id', () => {
     return request
       .post(`/albums/${albumId}`)
       .send({})
-      .set({ authorization: token })
+      .set(authorization)
       .then(response => {
         expect(response.statusCode).to.equal(201);
         return Album.findOne({ where: { albumId, userId } });
@@ -32,7 +31,7 @@ describe('POST /albums/:id', () => {
     request
       .post(`/albums/${albumId}`)
       .send({})
-      .set({ authorization: 'invalid' })
+      .set(authorizationFactory.invalid)
       .then(response => {
         expect(response.statusCode).to.equal(401);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
@@ -43,7 +42,7 @@ describe('POST /albums/:id', () => {
     return request
       .post(`/albums/${albumId}`)
       .send({})
-      .set({ authorization: token })
+      .set(authorization)
       .then(response => {
         expect(response.statusCode).to.equal(502);
         expect(response.body.internal_code).to.equal(EXTERNAL_API_ERROR);
@@ -56,7 +55,7 @@ describe('POST /albums/:id', () => {
     return request
       .post(`/albums/${albumId}`)
       .send({})
-      .set({ authorization: token })
+      .set(authorization)
       .then(response => {
         expect(response.statusCode).to.equal(422);
         expect(response.body.internal_code).to.equal(ENTITY_ALREADY_EXISTS);
