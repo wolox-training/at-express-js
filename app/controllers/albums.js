@@ -5,7 +5,9 @@ const { createURIsList } = require('../serializers');
 exports.getAlbums = (req, res, next) => {
   const { userId } = req.params;
   if (userId) {
-    return getUserAlbums(userId).then(createURIsList);
+    return getUserAlbums(userId)
+      .then(response => res.send(createURIsList(response, 'albums', 'albumId')))
+      .catch(next);
   }
 
   const albumId = req.params.id;

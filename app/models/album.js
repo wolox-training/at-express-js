@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       .catch(handleError('Unable to create new album'));
 
   Album.findBy = query =>
-    Album.find({ where: { ...query } })
+    Album.findAll({ where: { ...query } })
       .then(prepareResponse)
       .catch(handleError('Unable to find albums'));
 

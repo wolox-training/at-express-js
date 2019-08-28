@@ -17,7 +17,7 @@ exports.init = app => {
 
   app.get('/users', validateToken, getUsers);
   app.get('/users/:id', validateToken, getUsers);
-  app.get('/users/:userId/album', [validateToken, validateAlbumPermissions], getAlbums);
+  app.get('/users/:userId/albums', [validateToken, validateAlbumPermissions], getAlbums);
   app.post('/users', [checkSchema(userSchema), getValidationErrors], signUp);
   app.post('/users/sessions', [checkSchema(signedUpUserSchema), getValidationErrors], signIn);
   app.post(

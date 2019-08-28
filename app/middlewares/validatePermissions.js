@@ -10,7 +10,7 @@ exports.validatePermissions = roles => (req, res, next) => {
 
 exports.validateAlbumPermissions = (req, res, next) => {
   const { userId, role } = req.locals;
-  const resquestedUserId = req.params.userId;
+  const resquestedUserId = parseInt(req.params.userId);
 
   if (role === ADMIN_ROLE || resquestedUserId === userId) {
     return next();
