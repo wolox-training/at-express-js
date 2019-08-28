@@ -11,7 +11,13 @@ exports.getAllUsers = (getPage = 1, pageSize = 10) => () => {
   const offset = (page - 1) * pageSize;
   const limit = parseInt(pageSize);
 
-  const prepareResponse = paginatedResponse({ resource: 'users', offset, limit, page });
+  const prepareResponse = paginatedResponse({
+    resource: 'users',
+    offset,
+    limit,
+    page,
+    getFieldsFn: getUserFields
+  });
 
   return User.getAll({ offset, limit }).then(prepareResponse);
 };
