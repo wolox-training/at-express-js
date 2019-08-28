@@ -13,3 +13,6 @@ exports.invalidEmailDomainMessage = `The email must be @${exports.EMAIL_DOMAIN}`
 exports.authenticationErrorMessage = 'Unable to authenticate credentials';
 exports.usernameNotFoundErrorMessage = 'Username not found';
 exports.MISSING_FIELD = 'missing_field';
+exports.userNotFoundErrorMessage = 'The user you are looking for was not found';
+exports.ADMIN_ROLE = 'admin';
+exports.REGULAR_ROLE = 'regular';

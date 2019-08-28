@@ -11,7 +11,9 @@ const statusCodes = {
   [errors.ENCRYPTION_ERROR]: 500,
   [errors.ENTITY_ALREADY_EXISTS]: 422,
   [errors.MISSING_DATA_ERROR]: 400,
-  [errors.AUTHENTICATION_ERROR]: 401
+  [errors.AUTHENTICATION_ERROR]: 401,
+  [errors.NOT_FOUND_ERROR]: 404,
+  [errors.FORBIDDEN_ERROR]: 403
 };
 
 exports.handle = (error, req, res, next) => {
@@ -22,6 +24,6 @@ exports.handle = (error, req, res, next) => {
     next(error);
     res.status(DEFAULT_STATUS_CODE);
   }
-  logger.error(error);
+  logger.error(error.message);
   return res.send({ message: error.message, internal_code: error.internalCode });
 };
