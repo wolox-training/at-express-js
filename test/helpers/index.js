@@ -1,6 +1,6 @@
 const { factory } = require('factory-girl');
 const { User } = require('../../app/models');
-const { hashPassword } = require('../../app/helpers');
+const { hashPassword } = require('../../app/services/encryption');
 const { EMAIL_DOMAIN } = require('../../app/helpers');
 const { extractField } = require('../serializers/fieldExtractor');
 
