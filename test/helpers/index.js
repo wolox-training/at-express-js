@@ -2,7 +2,7 @@ const { factory } = require('factory-girl');
 const { User } = require('../../app/models');
 const { hashPassword } = require('../../app/helpers');
 const { EMAIL_DOMAIN } = require('../../app/helpers');
-const { extractField } = require('../../app/serializers');
+const { extractField } = require('../serializers/fieldExtractor');
 
 factory.define('user', User, {
   firstName: factory.chance('first'),
@@ -11,4 +11,5 @@ factory.define('user', User, {
   password: () => hashPassword({ password: '1234567ocho' }).then(hashed => hashed.password)
 });
 
-exports.createUsers = count => factory.createMany('user', count).then(extractField('dataValues'));
+exports.runFactory = factoryName => count =>
+  factory.createMany(factoryName, count).then(extractField('dataValues'));

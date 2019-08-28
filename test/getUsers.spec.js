@@ -2,11 +2,11 @@ const supertest = require('supertest');
 const { expect } = require('chai');
 const app = require('../app');
 const request = supertest(app);
-const { createUsers } = require('./helpers');
+const { runFactory } = require('./helpers');
 const { host, port } = require('../config').common.api;
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
 const { createToken } = require('../app/helpers');
-
+const createUsers = runFactory('user');
 const expected = {
   count: 25,
   status: 200,
