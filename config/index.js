@@ -37,7 +37,7 @@ const config = {
       bodySizeLimit: process.env.API_BODY_SIZE_LIMIT,
       parameterLimit: process.env.API_PARAMETER_LIMIT,
       port: process.env.PORT,
-      host: process.env.HOST
+      host: `${process.env.HOST}:${process.env.PORT}`
     },
     externalApi: {
       albumsEndpoint: process.env.EXTERNAL_API_ALBUMS,

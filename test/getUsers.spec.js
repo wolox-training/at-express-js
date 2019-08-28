@@ -4,7 +4,7 @@ const app = require('../app');
 const request = supertest(app);
 const { authorizationFactory } = require('./helpers');
 const { runFactory } = require('./helpers');
-const { host, port } = require('../config').common.api;
+const { host } = require('../config').common.api;
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
 
 const createUsers = runFactory('user');
@@ -31,14 +31,14 @@ describe('GET /users', () => {
     createUsers(25)
       .then(() => request.get('/users').set(authorizationFactory.regular(1)))
       .then(response => {
-        checkResponse(response, { ...expected, next: `${host}:${port}/users?page=2` });
+        checkResponse(response, { ...expected, next: `${host}/users?page=2` });
         return getNextRequest(2);
       })
       .then(response => {
         checkResponse(response, {
           ...expected,
-          next: `${host}:${port}/users?page=3`,
-          prev: `${host}:${port}/users?page=1`
+          next: `${host}/users?page=3`,
+          prev: `${host}/users?page=1`
         });
         return getNextRequest(3);
       })
@@ -46,7 +46,7 @@ describe('GET /users', () => {
         checkResponse(response, {
           ...expected,
           resultLength: 5,
-          prev: `${host}:${port}/users?page=2`
+          prev: `${host}/users?page=2`
         });
       }));
 
