@@ -6,8 +6,8 @@ const { User } = require('../app/models');
 const { mockUser } = require('./mocks/mockUsers');
 const { FORBIDDEN_ERROR } = require('../app/errors');
 const { createToken, ADMIN_ROLE, REGULAR_ROLE } = require('../app/helpers');
-const { createUsers } = require('./helpers');
-
+const { runFactory } = require('./helpers');
+const createUsers = runFactory('user');
 describe('POST /admin/users', () => {
   it('should succeed when user has authorization (create new admin)', () =>
     createUsers(1)
