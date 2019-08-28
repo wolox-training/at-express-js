@@ -12,7 +12,7 @@ exports.signUp = (req, res, next) => {
     .then(hashedUser => User.createUser(hashedUser))
     .then(result => {
       logger.info(`A user '${result.firstName}' has been created`);
-      res.status(201).end();
+      res.status(201).send({ userId: result.id });
     })
     .catch(error => {
       logger.error(error.message);
