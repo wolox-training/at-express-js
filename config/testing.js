@@ -6,7 +6,7 @@ exports.config = {
       name: process.env.DB_NAME_TEST
     },
     api: {
-      host: process.env.TEST_HOST
+      host: `${process.env.HOST}:${process.env.PORT}`
     },
     externalApi: {
       albumsEndpoint: 'https://jsonplaceholder.typicode.com/albums'
