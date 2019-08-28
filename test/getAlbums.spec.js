@@ -2,9 +2,12 @@ const supertest = require('supertest');
 const { expect } = require('chai');
 const app = require('../app');
 const request = supertest(app);
-const { createUsers, createAlbums } = require('./helpers');
+const { runFactory } = require('./helpers');
 const { AUTHENTICATION_ERROR, FORBIDDEN_ERROR } = require('../app/errors');
 const { authorizationFactory } = require('./helpers');
+
+const createUsers = runFactory('user');
+const createAlbums = runFactory('album');
 
 const checkSuccessfulResponse = response => {
   expect(response.statusCode).to.equal(200);
