@@ -25,7 +25,7 @@ exports.getUserByEmail = email =>
       return user;
     })
     .catch(handleError('Unable to find user'));
-exports.createUser = user => User.createUser(user).catch(handleError('Unable to create new user'));
+exports.createUser = user => User.create(user).catch(handleError('Unable to create new user'));
 
 exports.createAdminUser = hashedUser =>
   User.createAdmin(hashedUser).catch(handleError(`Unable to create ${ADMIN_ROLE} user`));

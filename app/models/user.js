@@ -33,8 +33,6 @@ module.exports = (sequelize, DataTypes) => {
     { underscored: true }
   );
 
-  User.createUser = user => User.create(user);
-
   User.createAdmin = user => User.upsert({ ...user, role: ADMIN_ROLE });
 
   User.findBy = query => User.findOne({ where: { ...query } }).then(extractField('dataValues'));
