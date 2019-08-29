@@ -6,7 +6,6 @@ const {
   invalidPasswordMessage,
   invalidEmailDomainMessage,
   missingRequiredFieldsMessage,
-  usernameNotFoundErrorMessage,
   authenticationErrorMessage
 } = require('../app/helpers');
 const {
