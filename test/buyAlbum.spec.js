@@ -56,7 +56,8 @@ describe('POST /albums/:id', () => {
         request
           .post(`/albums/${albumId}`)
           .send({})
-          .set(authorization))
+          .set(authorization)
+      )
       .then(response => {
         expect(response.statusCode).to.equal(422);
         expect(response.body.internal_code).to.equal(ENTITY_ALREADY_EXISTS);
