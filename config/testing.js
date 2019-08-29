@@ -8,6 +8,9 @@ exports.config = {
     api: {
       host: process.env.TEST_HOST
     },
+    externalApi: {
+      albumsEndpoint: 'https://fake.com/albums'
+    },
     token: {
       secret: 'some-super-secret'
     },

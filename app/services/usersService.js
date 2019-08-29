@@ -1,31 +1,31 @@
 const { User } = require('../models');
 const { notFoundError } = require('../errors');
-const { userNotFoundErrorMessage } = require('../helpers');
-const { extractFields, paginatedResponse } = require('../serializers');
-const { userSchema } = require('../schemas/userSchema');
+const { userNotFoundErrorMessage, ADMIN_ROLE } = require('../helpers');
+const { handleError } = require('./commons/errorHandler');
 
-const getUserFields = extractFields(userSchema, 'password');
-
-exports.getAllUsers = (getPage = 1, pageSize = 10) => () => {
-  const page = parseInt(getPage);
-  const offset = (page - 1) * pageSize;
-  const limit = parseInt(pageSize);
-
-  const prepareResponse = paginatedResponse({
-    resource: 'users',
-    offset,
-    limit,
-    page,
-    getFieldsFn: getUserFields
-  });
-
-  return User.getAll({ offset, limit }).then(prepareResponse);
-};
+exports.getAllUsers = (getPage, pageSize, offset, limit) =>
+  User.getAll({ offset, limit }).catch(handleError('Unable to get users'));
 
 exports.getUserById = id =>
-  User.findBy({ id }).then(user => {
-    if (!user) {
-      throw notFoundError(userNotFoundErrorMessage);
-    }
-    return getUserFields(user);
-  });
+  User.findBy({ id })
+    .then(user => {
+      if (!user) {
+        throw notFoundError(userNotFoundErrorMessage);
+      }
+      return user;
+    })
+    .catch(handleError('Unable to find user'));
+
+exports.getUserByEmail = email =>
+  User.findBy({ email })
+    .then(user => {
+      if (!user) {
+        throw notFoundError(userNotFoundErrorMessage);
+      }
+      return user;
+    })
+    .catch(handleError('Unable to find user'));
+exports.createUser = user => User.create(user).catch(handleError('Unable to create new user'));
+
+exports.createAdminUser = hashedUser =>
+  User.createAdmin(hashedUser).catch(handleError(`Unable to create ${ADMIN_ROLE} user`));

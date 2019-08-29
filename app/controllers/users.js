@@ -1,15 +1,25 @@
 const logger = require('../logger');
-const { User } = require('../models');
 const { createToken } = require('../helpers');
 const { hashPassword, comparePassword } = require('../services/encryption');
-const { usernameNotFoundErrorMessage, authenticationErrorMessage } = require('../helpers');
-const { authenticationError } = require('../errors');
-const { getAllUsers, getUserById } = require('../services/usersService');
+const { authenticationErrorMessage } = require('../helpers');
+const { authenticationError, NOT_FOUND_ERROR } = require('../errors');
+const { extractFields, paginatedResponse } = require('../serializers');
+const { userSchema } = require('../schemas/userSchema');
+
+const {
+  getAllUsers,
+  getUserById,
+  createUser,
+  createAdminUser,
+  getUserByEmail
+} = require('../services/usersService');
+
+const getUserFields = extractFields(userSchema, 'password');
 
 exports.signUp = (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
   return hashPassword({ firstName, lastName, email, password })
-    .then(hashedUser => User.createUser(hashedUser))
+    .then(createUser)
     .then(result => {
       logger.info(`A user '${result.firstName}' has been created`);
       res.status(201).end();
@@ -23,31 +33,47 @@ exports.signUp = (req, res, next) => {
 exports.signIn = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findBy({ email })
-    .then(user => {
-      if (!user) {
-        throw authenticationError(usernameNotFoundErrorMessage);
-      }
-      return Promise.all([comparePassword({ user, password }), user]);
-    })
+  return getUserByEmail(email)
+    .then(user => Promise.all([comparePassword({ user, password }), user]))
     .then(([arePasswordEql, user]) => {
       if (!arePasswordEql) {
         throw authenticationError(authenticationErrorMessage);
       }
-      const token = createToken({ email: user.email, role: user.role });
+      const token = createToken({ userId: user.id, role: user.role });
       res.set('authorization', token).end();
     })
     .catch(error => {
       logger.error(error);
-      next(error);
+      if (error.internalCode === NOT_FOUND_ERROR) {
+        return next(authenticationError(authenticationErrorMessage));
+      }
+      return next(error);
     });
 };
 
 exports.getUsers = (req, res, next) => {
   const { id } = req.params;
-  const { page, pageSize } = req.query;
-  const selectGetFn = id ? getUserById : getAllUsers(page, pageSize);
-  return selectGetFn(id)
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = req.query.pageSize || 10;
+  const offset = (page - 1) * pageSize;
+  const limit = parseInt(pageSize);
+
+  const prepareResponse = paginatedResponse({
+    resource: 'users',
+    offset,
+    limit,
+    page,
+    getFieldsFn: getUserFields
+  });
+
+  if (id) {
+    return getUserById(id)
+      .then(response => res.send(getUserFields(response)))
+      .catch(next);
+  }
+
+  return getAllUsers(page, pageSize, offset, limit)
+    .then(prepareResponse)
     .then(response => res.send(response))
     .catch(next);
 };
@@ -63,11 +89,10 @@ exports.createAdmin = (req, res, next) => {
     res.end();
   };
 
-  const setAdmin = hashedUser => User.createAdmin(hashedUser);
   const respond = created => (created ? userCreatedResponse() : userUpdatedResponse());
 
   return hashPassword({ firstName, lastName, email, password })
-    .then(setAdmin)
+    .then(createAdminUser)
     .then(respond)
     .catch(next);
 };

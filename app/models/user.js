@@ -1,20 +1,6 @@
 'use strict';
-const logger = require('../logger');
-const { databaseError } = require('../errors');
-const { dbErrorCodes, REGULAR_ROLE, ADMIN_ROLE } = require('../helpers');
-const { extractField } = require('../serializers');
-
-const handleError = genericMessage => error => {
-  logger.error(error.message);
-  const { message, errorFn } = dbErrorCodes[error.name] || { message: genericMessage };
-  if (errorFn) {
-    throw errorFn(`${genericMessage}. ${message}`);
-  }
-  logger.error(message);
-  throw databaseError(genericMessage);
-};
-
-const prepareResponse = extractField('dataValues');
+const { REGULAR_ROLE, ADMIN_ROLE } = require('../helpers');
+const { extractField } = require('../serializers/fieldExtractor');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -47,26 +33,15 @@ module.exports = (sequelize, DataTypes) => {
     { underscored: true }
   );
 
-  User.createUser = user =>
-    User.create(user)
-      .then(prepareResponse)
-      .catch(handleError('Unable to create new user'));
+  User.createAdmin = user => User.upsert({ ...user, role: ADMIN_ROLE });
 
-  User.createAdmin = user =>
-    User.upsert({ ...user, role: ADMIN_ROLE }).catch(handleError(`Unable to create ${ADMIN_ROLE} user`));
-
-  User.findBy = query =>
-    User.findOne({ where: { ...query } })
-      .then(prepareResponse)
-      .catch(handleError('Unable to find user'));
+  User.findBy = query => User.findOne({ where: { ...query } }).then(extractField('dataValues'));
 
   User.getAll = ({ offset, limit }) =>
-    User.findAndCountAll({ offset, limit })
-      .then(result => ({
-        count: result.count,
-        rows: prepareResponse(result.rows)
-      }))
-      .catch(handleError('Unable to get users'));
+    User.findAndCountAll({ offset, limit }).then(result => ({
+      count: result.count,
+      rows: extractField('dataValues')(result.rows)
+    }));
 
   return User;
 };
