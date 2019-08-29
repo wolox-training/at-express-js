@@ -9,7 +9,7 @@ exports.config = {
       host: process.env.TEST_HOST
     },
     externalApi: {
-      albumsEndpoint: 'https://jsonplaceholder.typicode.com/albums'
+      albumsEndpoint: 'https://fake.com/albums'
     },
     token: {
       secret: 'some-super-secret'

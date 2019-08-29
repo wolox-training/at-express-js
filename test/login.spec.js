@@ -68,7 +68,6 @@ describe('POST /users/sessions', () => {
       .then(login(unexistentUserNameUser))
       .then(response => {
         expect(response.statusCode).to.equal(401);
-        expect(response.body.message).to.include(usernameNotFoundErrorMessage);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
       }));
 
