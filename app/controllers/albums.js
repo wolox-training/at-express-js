@@ -1,7 +1,8 @@
 const { getAllAlbums, getAlbumById, getPhotosByAlbum } = require('../services/externalServices');
-const { createUserAlbum, getUserAlbums } = require('../services/albums');
+const { createUserAlbum, getUserAlbums, getUserAlbum } = require('../services/albums');
 const { createURIsList } = require('../serializers/createURIsList');
 const { extractField } = require('../serializers/fieldExtractor');
+const { notFoundError } = require('../errors');
 
 exports.getAlbums = (req, res, next) => {
   const { userId } = req.params;
@@ -32,5 +33,21 @@ exports.buyAlbum = (req, res, next) => {
   return getAlbumById(parseInt(id))
     .then(createUserAlbum(userId))
     .then(() => res.status(201).end())
+    .catch(next);
+};
+
+exports.getUserAlbumPhotos = (req, res, next) => {
+  const { userId } = req.locals;
+  const albumId = parseInt(req.params.albumId);
+
+  return getUserAlbum(userId, albumId)
+    .then(extractField('dataValues'))
+    .then(([album]) => {
+      if (!album) {
+        return next(notFoundError('The album you are looking for does not exist or does not belong to you'));
+      }
+      return getPhotosByAlbum(albumId);
+    })
+    .then(response => res.send(response))
     .catch(next);
 };

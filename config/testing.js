@@ -9,7 +9,8 @@ exports.config = {
       host: `${process.env.HOST}:${process.env.PORT}`
     },
     externalApi: {
-      albumsEndpoint: 'https://fake.com/albums'
+      albumsEndpoint: 'https://fake.com/albums',
+      photosEndpoint: 'https://fake.com/photos'
     },
     token: {
       secret: 'some-super-secret'
