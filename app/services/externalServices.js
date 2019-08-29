@@ -1,12 +1,15 @@
 const axios = require('axios');
 const { albumsEndpoint, photosEndpoint } = require('../../config').common.externalApi;
-const { externalApiError } = require('../errors');
+const { externalApiError, notFoundError } = require('../errors');
 
 const formatData = response => response.data;
 
 const processExternalRequest = request =>
-  request.then(formatData).catch(responseError => {
-    throw externalApiError(responseError.message);
+  request.then(formatData).catch(error => {
+    if (error.response.status === 404) {
+      throw notFoundError(error.message);
+    }
+    throw externalApiError(error.message);
   });
 
 exports.getAllAlbums = () => processExternalRequest(axios.get(albumsEndpoint));
