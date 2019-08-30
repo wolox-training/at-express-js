@@ -1,18 +1,9 @@
 const logger = require('../logger');
-const { createToken } = require('../helpers');
-const { hashPassword, comparePassword } = require('../services/encryption');
-const { authenticationErrorMessage } = require('../helpers');
-const { authenticationError, NOT_FOUND_ERROR } = require('../errors');
+const { hashPassword } = require('../services/encryption');
 const { extractFields, paginatedResponse } = require('../serializers');
 const { userSchema } = require('../schemas/userSchema');
 
-const {
-  getAllUsers,
-  getUserById,
-  createUser,
-  createAdminUser,
-  getUserByEmail
-} = require('../services/usersService');
+const { getAllUsers, getUserById, createUser, createAdminUser } = require('../services/usersService');
 
 const getUserFields = extractFields(userSchema, 'password');
 
@@ -27,27 +18,6 @@ exports.signUp = (req, res, next) => {
     .catch(error => {
       logger.error(error.message);
       next(error);
-    });
-};
-
-exports.signIn = (req, res, next) => {
-  const { email, password } = req.body;
-
-  return getUserByEmail(email)
-    .then(user => Promise.all([comparePassword({ user, password }), user]))
-    .then(([arePasswordEql, user]) => {
-      if (!arePasswordEql) {
-        throw authenticationError(authenticationErrorMessage);
-      }
-      const token = createToken({ userId: user.id, role: user.role });
-      res.set('authorization', token).end();
-    })
-    .catch(error => {
-      logger.error(error);
-      if (error.internalCode === NOT_FOUND_ERROR) {
-        return next(authenticationError(authenticationErrorMessage));
-      }
-      return next(error);
     });
 };
 
