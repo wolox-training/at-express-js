@@ -4,14 +4,21 @@ const { validatePermissions, validateAlbumPermissions } = require('./middlewares
 const { healthCheck } = require('./controllers/healthCheck');
 const { getAlbums, getPhotos, buyAlbum, getUserAlbumPhotos } = require('./controllers/albums');
 const { signUp, getUsers, createAdmin } = require('./controllers/users');
-const { signIn, invalidateSessions } = require('./controllers/sessions');
+const { signIn, invalidateSessions, setSessionExipration } = require('./controllers/sessions');
 const { userSchema } = require('./schemas/userSchema');
 const { signedUpUserSchema } = require('./schemas/signedUpUserSchema');
+const { sessionExpirationSchema } = require('./schemas/session_expiration');
 const { validateToken } = require('./middlewares/validateToken');
 const { ADMIN_ROLE } = require('./helpers');
 
 exports.init = app => {
   app.get('/health', healthCheck);
+  app.post(
+    '/sessions/expiration',
+    [checkSchema(sessionExpirationSchema), validateToken],
+    setSessionExipration
+  );
+
   app.get('/albums', getAlbums);
   app.get('/albums/:id', getAlbums);
   app.get('/albums/:id/photos', getPhotos);

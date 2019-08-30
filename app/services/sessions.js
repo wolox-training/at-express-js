@@ -1,4 +1,4 @@
-const { Session } = require('../models');
+const { Session, SessionsConfig } = require('../models');
 const { handleError } = require('../services/commons/errorHandler');
 
 exports.createSession = (token, userId) =>
@@ -6,3 +6,6 @@ exports.createSession = (token, userId) =>
 
 exports.invalidateAllSessions = userId =>
   Session.remove({ userId }).catch(handleError('Unable to invalidate sessions'));
+
+exports.sessionsExpiration = duration =>
+  SessionsConfig.update(duration, 'token').catch(handleError('Unable to configure sessions expiration'));

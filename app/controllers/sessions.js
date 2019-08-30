@@ -4,7 +4,7 @@ const { authenticationErrorMessage } = require('../helpers');
 const { authenticationError, NOT_FOUND_ERROR } = require('../errors');
 const { getUserByEmail } = require('../services/usersService');
 const logger = require('../logger');
-const { createSession, invalidateAllSessions } = require('../services/sessions');
+const { createSession, invalidateAllSessions, sessionsExpiration } = require('../services/sessions');
 
 exports.signIn = (req, res, next) => {
   const { email, password } = req.body;
@@ -32,3 +32,10 @@ exports.invalidateSessions = (req, res, next) =>
   invalidateAllSessions(req.locals.userId)
     .then(() => res.status(204).end())
     .catch(next);
+
+exports.setSessionExipration = (req, res, next) => {
+  const { duration } = req.query;
+  return sessionsExpiration(duration)
+    .then(() => res.status(204).end())
+    .catch(next);
+};
