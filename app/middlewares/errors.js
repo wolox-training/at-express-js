@@ -13,7 +13,8 @@ const statusCodes = {
   [errors.MISSING_DATA_ERROR]: 400,
   [errors.AUTHENTICATION_ERROR]: 401,
   [errors.NOT_FOUND_ERROR]: 404,
-  [errors.FORBIDDEN_ERROR]: 403
+  [errors.FORBIDDEN_ERROR]: 403,
+  [errors.SESSION_EXPIRED_ERROR]: 403
 };
 
 exports.handle = (error, req, res, next) => {

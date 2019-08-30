@@ -11,11 +11,12 @@ const createUsers = runFactory('user');
 describe('POST /admin/users', () => {
   it('should succeed when user has authorization (create new admin)', () =>
     createUsers(1)
-      .then(result =>
+      .then(result => authorizationFactory.admin(result[0].id))
+      .then(authorization =>
         request
           .post('/admin/users')
           .send(mockUser)
-          .set(authorizationFactory.admin(result[0].id))
+          .set(authorization)
       )
       .then(response => {
         expect(response.statusCode).to.equal(201);
@@ -30,12 +31,13 @@ describe('POST /admin/users', () => {
 
   it('should succeed when user has authorization (update existing user)', () =>
     createUsers(2)
-      .then(([user, userToUpdate]) =>
+      .then(([user, userToUpdate]) => Promise.all([userToUpdate, authorizationFactory.admin(user.id)]))
+      .then(([userToUpdate, authorization]) =>
         Promise.all([
           request
             .post('/admin/users')
             .send({ ...mockUser, email: userToUpdate.email })
-            .set(authorizationFactory.admin(user.id)),
+            .set(authorization),
           userToUpdate
         ])
       )
@@ -49,11 +51,12 @@ describe('POST /admin/users', () => {
 
   it('should fail because user is not authorized', () =>
     createUsers(1)
-      .then(result =>
+      .then(result => authorizationFactory.regular(result[0].id))
+      .then(authorization =>
         request
           .post('/admin/users')
           .send(mockUser)
-          .set(authorizationFactory.regular(result[0].id))
+          .set(authorization)
       )
       .then(response => {
         expect(response.statusCode).to.equal(403);

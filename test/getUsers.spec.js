@@ -16,7 +16,10 @@ const expected = {
   next: null
 };
 
-const getNextRequest = page => request.get(`/users?page=${page}`).set(authorizationFactory.regular(1));
+const getNextRequest = page =>
+  authorizationFactory
+    .regular(1)
+    .then(authorization => request.get(`/users?page=${page}`).set(authorization));
 
 const checkResponse = (response, expectedValues) => {
   expect(response.statusCode).to.equal(expectedValues.status);
@@ -29,7 +32,8 @@ const checkResponse = (response, expectedValues) => {
 describe('GET /users', () => {
   it('should success when user is logged in', () =>
     createUsers(25)
-      .then(() => request.get('/users').set(authorizationFactory.regular(1)))
+      .then(() => authorizationFactory.regular(1))
+      .then(authorization => request.get('/users').set(authorization))
       .then(response => {
         checkResponse(response, { ...expected, next: `${host}/users?page=2` });
         return getNextRequest(2);
@@ -63,7 +67,8 @@ describe('GET /users', () => {
 describe('GET /users/:id', () => {
   it('should success when user is logged in', () =>
     createUsers(2)
-      .then(result => request.get(`/users/${result[1].id}`).set(authorizationFactory.regular(result[0].id)))
+      .then(result => Promise.all([authorizationFactory.regular(result[0].id), result[0]]))
+      .then(([authorization, user]) => request.get(`/users/${user.id}`).set(authorization))
       .then(response => {
         expect(response.statusCode).to.equal(200);
         expect(response.body).to.have.property('firstName');
@@ -82,7 +87,8 @@ describe('GET /users/:id', () => {
 
   it('should fail because user requested does not exist', () =>
     createUsers(1)
-      .then(result => request.get('/users/9999').set(authorizationFactory.regular(result[0].id)))
+      .then(result => authorizationFactory.regular(result[0].id))
+      .then(authorization => request.get('/users/9999').set(authorization))
       .then(response => {
         expect(response.statusCode).to.equal(404);
         expect(response.body.internal_code).to.equal(NOT_FOUND_ERROR);

@@ -11,8 +11,8 @@ const createAlbums = runFactory('album');
 describe('GET /users/albums/:albumId/photos', () => {
   it('should success when user is authenticated and album owner', () =>
     createAlbums(1)
-      .then(([{ userId, albumId }]) => {
-        const authorization = authorizationFactory.regular(userId);
+      .then(([{ userId, albumId }]) => Promise.all([albumId, authorizationFactory.regular(userId)]))
+      .then(([albumId, authorization]) => {
         getAlbumsPhotos(albumId);
         return request.get(`/users/albums/${albumId}/photos`).set(authorization);
       })
@@ -34,8 +34,8 @@ describe('GET /users/albums/:albumId/photos', () => {
 
   it('should fail because user is not album owner (regular user)', () =>
     createAlbums(1)
-      .then(([{ userId, albumId }]) => {
-        const authorization = authorizationFactory.regular(userId + 1);
+      .then(([{ userId, albumId }]) => Promise.all([albumId, authorizationFactory.regular(userId + 1)]))
+      .then(([albumId, authorization]) => {
         getAlbumsPhotos(albumId);
         return request.get(`/users/albums/${albumId}/photos`).set(authorization);
       })
@@ -46,8 +46,8 @@ describe('GET /users/albums/:albumId/photos', () => {
 
   it('should fail because user is not album owner (admin user)', () =>
     createAlbums(1)
-      .then(([{ userId, albumId }]) => {
-        const authorization = authorizationFactory.admin(userId + 1);
+      .then(([{ userId, albumId }]) => Promise.all([albumId, authorizationFactory.admin(userId + 1)]))
+      .then(([albumId, authorization]) => {
         getAlbumsPhotos(albumId);
         return request.get(`/users/albums/${albumId}/photos`).set(authorization);
       })
@@ -58,8 +58,8 @@ describe('GET /users/albums/:albumId/photos', () => {
 
   it('should fail because album does not exist', () =>
     createAlbums(1)
-      .then(([{ userId, albumId }]) => {
-        const authorization = authorizationFactory.admin(userId);
+      .then(([{ userId, albumId }]) => Promise.all([albumId, authorizationFactory.admin(userId)]))
+      .then(([albumId, authorization]) => {
         getAlbumsPhotos(albumId);
         return request.get(`/users/albums/${albumId + 1}/photos`).set(authorization);
       })

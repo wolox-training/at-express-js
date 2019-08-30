@@ -8,15 +8,18 @@ const { UserAlbum } = require('../app/models');
 const { authorizationFactory } = require('./helpers');
 const albumId = 1;
 const userId = 15;
-const authorization = authorizationFactory.regular(userId);
 
 describe('POST /albums/:id', () => {
   it('should succeed when user is authenticated and has not bought the album already', () => {
     getAlbum(albumId);
-    return request
-      .post(`/albums/${albumId}`)
-      .send({})
-      .set(authorization)
+    return authorizationFactory
+      .regular(userId)
+      .then(authorization =>
+        request
+          .post(`/albums/${albumId}`)
+          .send({})
+          .set(authorization)
+      )
       .then(response => {
         expect(response.statusCode).to.equal(201);
         return UserAlbum.findOne({ where: { albumId, userId } });
@@ -39,10 +42,14 @@ describe('POST /albums/:id', () => {
 
   it('should fail because album does not exists', () => {
     notFoundAlbum(albumId);
-    return request
-      .post(`/albums/${albumId}`)
-      .send({})
-      .set(authorization)
+    return authorizationFactory
+      .regular(userId)
+      .then(authorization =>
+        request
+          .post(`/albums/${albumId}`)
+          .send({})
+          .set(authorization)
+      )
       .then(response => {
         expect(response.statusCode).to.equal(404);
         expect(response.body.internal_code).to.equal(NOT_FOUND_ERROR);
@@ -52,7 +59,8 @@ describe('POST /albums/:id', () => {
   it('should fail because the album was already bought', () => {
     getAlbum(albumId);
     return UserAlbum.create({ albumId, userId })
-      .then(() =>
+      .then(() => authorizationFactory.regular(userId))
+      .then(authorization =>
         request
           .post(`/albums/${albumId}`)
           .send({})

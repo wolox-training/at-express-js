@@ -32,3 +32,6 @@ exports.notFoundError = message => internalError(message, exports.NOT_FOUND_ERRO
 
 exports.FORBIDDEN_ERROR = 'forbidden_error';
 exports.forbiddenError = message => internalError(message, exports.FORBIDDEN_ERROR);
+
+exports.SESSION_EXPIRED_ERROR = 'session_expired';
+exports.sessionExpiredError = message => internalError(message, exports.SESSION_EXPIRED_ERROR);

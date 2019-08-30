@@ -22,6 +22,8 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Session.remove = query => Session.destroy({ where: { ...query } });
+  Session.createSession = ({ token, userId }) => Session.findOrCreate({ where: { userId, token } });
+  Session.findBy = query => Session.findOne({ where: { ...query } });
   Session.removeAttribute('id');
   return Session;
 };
