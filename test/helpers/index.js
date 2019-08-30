@@ -1,7 +1,7 @@
 const { factory } = require('factory-girl');
-const { User } = require('../../app/models');
 const { hashPassword } = require('../../app/services/encryption');
-const { EMAIL_DOMAIN } = require('../../app/helpers');
+const { User, UserAlbum } = require('../../app/models');
+const { EMAIL_DOMAIN, createToken, REGULAR_ROLE, ADMIN_ROLE } = require('../../app/helpers');
 const { extractField } = require('../serializers/fieldExtractor');
 
 factory.define('user', User, {
@@ -13,3 +13,14 @@ factory.define('user', User, {
 
 exports.runFactory = factoryName => count =>
   factory.createMany(factoryName, count).then(extractField('dataValues'));
+
+factory.define('album', UserAlbum, {
+  userId: 1,
+  albumId: factory.seq('UserAlbum.albumId')
+});
+
+exports.authorizationFactory = {
+  regular: id => ({ authorization: createToken({ userId: id, role: REGULAR_ROLE }) }),
+  admin: id => ({ authorization: createToken({ userId: id, role: ADMIN_ROLE }) }),
+  invalid: { authorization: 'invalid' }
+};

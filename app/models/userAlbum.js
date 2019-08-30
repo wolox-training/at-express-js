@@ -22,6 +22,8 @@ module.exports = (sequelize, DataTypes) => {
   UserAlbum.createAlbum = (albumId, userId) =>
     UserAlbum.create({ albumId, userId }).then(extractField('dataValues'));
 
+  UserAlbum.findBy = query => UserAlbum.findAll({ where: { ...query } });
+
   UserAlbum.removeAttribute('id');
   return UserAlbum;
 };

@@ -1,7 +1,17 @@
 const { getAllAlbums, getAlbumById, getPhotosByAlbum } = require('../services/externalServices');
-const { createUserAlbum } = require('../services/albums');
+const { createUserAlbum, getUserAlbums } = require('../services/albums');
+const { createURIsList } = require('../serializers/createURIsList');
+const { extractField } = require('../serializers/fieldExtractor');
 
 exports.getAlbums = (req, res, next) => {
+  const { userId } = req.params;
+  if (userId) {
+    return getUserAlbums(userId)
+      .then(extractField('dataValues'))
+      .then(response => res.send(createURIsList(response, 'albums', 'albumId')))
+      .catch(next);
+  }
+
   const albumId = req.params.id;
   const selectGetFn = albumId ? getAlbumById : getAllAlbums;
   return selectGetFn(albumId)

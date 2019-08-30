@@ -22,7 +22,7 @@ exports.signUp = (req, res, next) => {
     .then(createUser)
     .then(result => {
       logger.info(`A user '${result.firstName}' has been created`);
-      res.status(201).end();
+      res.status(201).send({ userId: result.id });
     })
     .catch(error => {
       logger.error(error.message);
