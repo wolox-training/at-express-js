@@ -29,3 +29,6 @@ exports.createUser = user => User.create(user).catch(handleError('Unable to crea
 
 exports.createAdminUser = hashedUser =>
   User.createAdmin(hashedUser).catch(handleError(`Unable to create ${ADMIN_ROLE} user`));
+
+exports.invalidateUserSessions = userId =>
+  User.invalidateSessions(userId).catch(handleError('Unable to invalidate user sessions'));
