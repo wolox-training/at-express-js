@@ -42,7 +42,7 @@ exports.getUserAlbumPhotos = (req, res, next) => {
 
   return getUserAlbum(userId, albumId)
     .then(extractField('dataValues'))
-    .then(([album]) => {
+    .then(album => {
       if (!album) {
         return next(notFoundError('The album you are looking for does not exist or does not belong to you'));
       }

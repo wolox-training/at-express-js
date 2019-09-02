@@ -7,4 +7,4 @@ exports.createUserAlbum = userId => album =>
 exports.getUserAlbums = userId => UserAlbum.findBy({ userId }).catch(handleError('Unable to find album'));
 
 exports.getUserAlbum = (userId, albumId) =>
-  UserAlbum.findBy({ userId, albumId }).catch(handleError('Unable to find album'));
+  UserAlbum.findOne({ where: { userId, albumId } }).catch(handleError('Unable to find album'));
