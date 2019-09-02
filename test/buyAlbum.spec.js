@@ -5,18 +5,22 @@ const request = supertest(app);
 const { getAlbum, notFoundAlbum } = require('./mocks/mockAlbums');
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR, ENTITY_ALREADY_EXISTS } = require('../app/errors');
 const { UserAlbum } = require('../app/models');
-const { authorizationFactory } = require('./helpers');
+const { authorizationFactory, runFactory } = require('./helpers');
 const albumId = 1;
-const userId = 15;
+const userId = 1;
 const authorization = authorizationFactory.regular(userId);
+const createUser = runFactory('user');
 
 describe('POST /albums/:id', () => {
   it('should succeed when user is authenticated and has not bought the album already', () => {
     getAlbum(albumId);
-    return request
-      .post(`/albums/${albumId}`)
-      .send({})
-      .set(authorization)
+    return createUser(1)
+      .then(() =>
+        request
+          .post(`/albums/${albumId}`)
+          .send({})
+          .set(authorization)
+      )
       .then(response => {
         expect(response.statusCode).to.equal(201);
         return UserAlbum.findOne({ where: { albumId, userId } });
@@ -39,10 +43,13 @@ describe('POST /albums/:id', () => {
 
   it('should fail because album does not exists', () => {
     notFoundAlbum(albumId);
-    return request
-      .post(`/albums/${albumId}`)
-      .send({})
-      .set(authorization)
+    return createUser(1)
+      .then(() =>
+        request
+          .post(`/albums/${albumId}`)
+          .send({})
+          .set(authorization)
+      )
       .then(response => {
         expect(response.statusCode).to.equal(404);
         expect(response.body.internal_code).to.equal(NOT_FOUND_ERROR);
@@ -52,6 +59,7 @@ describe('POST /albums/:id', () => {
   it('should fail because the album was already bought', () => {
     getAlbum(albumId);
     return UserAlbum.create({ albumId, userId })
+      .then(() => createUser(1))
       .then(() =>
         request
           .post(`/albums/${albumId}`)

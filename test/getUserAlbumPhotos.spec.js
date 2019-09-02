@@ -7,10 +7,12 @@ const { runFactory, authorizationFactory } = require('./helpers');
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
 
 const createAlbums = runFactory('album');
+const createUser = runFactory('user');
 
 describe('GET /users/albums/:albumId/photos', () => {
   it('should success when user is authenticated and album owner', () =>
-    createAlbums(1)
+    createUser(1)
+      .then(() => createAlbums(1))
       .then(([{ userId, albumId }]) => {
         const authorization = authorizationFactory.regular(userId);
         getAlbumsPhotos(albumId);
@@ -33,9 +35,10 @@ describe('GET /users/albums/:albumId/photos', () => {
       }));
 
   it('should fail because user is not album owner (regular user)', () =>
-    createAlbums(1)
-      .then(([{ userId, albumId }]) => {
-        const authorization = authorizationFactory.regular(userId + 1);
+    createUser(2)
+      .then(() => createAlbums(1))
+      .then(([{ albumId }]) => {
+        const authorization = authorizationFactory.regular(2);
         getAlbumsPhotos(albumId);
         return request.get(`/users/albums/${albumId}/photos`).set(authorization);
       })
@@ -45,9 +48,10 @@ describe('GET /users/albums/:albumId/photos', () => {
       }));
 
   it('should fail because user is not album owner (admin user)', () =>
-    createAlbums(1)
-      .then(([{ userId, albumId }]) => {
-        const authorization = authorizationFactory.admin(userId + 1);
+    createUser(2)
+      .then(() => createAlbums(1))
+      .then(([{ albumId }]) => {
+        const authorization = authorizationFactory.admin(2);
         getAlbumsPhotos(albumId);
         return request.get(`/users/albums/${albumId}/photos`).set(authorization);
       })
@@ -57,7 +61,8 @@ describe('GET /users/albums/:albumId/photos', () => {
       }));
 
   it('should fail because album does not exist', () =>
-    createAlbums(1)
+    createUser(1)
+      .then(() => createAlbums(1))
       .then(([{ userId, albumId }]) => {
         const authorization = authorizationFactory.admin(userId);
         getAlbumsPhotos(albumId);
