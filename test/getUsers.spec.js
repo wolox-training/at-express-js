@@ -6,6 +6,7 @@ const { authorizationFactory } = require('./helpers');
 const { runFactory } = require('./helpers');
 const { host } = require('../config').common.api;
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
+const { invalidateUserSessions } = require('../app/services/usersService');
 
 const createUsers = runFactory('user');
 const expected = {
@@ -86,5 +87,23 @@ describe('GET /users/:id', () => {
       .then(response => {
         expect(response.statusCode).to.equal(404);
         expect(response.body.internal_code).to.equal(NOT_FOUND_ERROR);
+      }));
+
+  it('should fail because sessions have been invalidated', () =>
+    createUsers(1)
+      .then(([{ id }]) => Promise.all([authorizationFactory.regular(id), id]))
+      .then(([authorization, id]) => Promise.all([authorization, invalidateUserSessions(id)]))
+      .then(
+        ([authorization]) =>
+          new Promise(resolve => {
+            setTimeout(() => {
+              resolve(authorization);
+            }, 4000);
+          })
+      )
+      .then(authorization => request.get('/users').set(authorization))
+      .then(response => {
+        expect(response.statusCode).to.equal(401);
+        expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
       }));
 });
