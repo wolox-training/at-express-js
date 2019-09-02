@@ -19,7 +19,7 @@ Before running the app, make sure you have [postgresql installed](https://www.di
 3. CREATE ROLE "project_name" LOGIN CREATEDB PASSWORD 'project_name';
 
 Then, set in `.env` some variables:
-- DB_HOST=localhost
+- DB_HOST=localhostw
 - DB_PORT=5432
 - DB_USERNAME=project_name
 - DB_PASSWORD=project_name

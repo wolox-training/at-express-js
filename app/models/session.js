@@ -6,24 +6,21 @@ module.exports = (sequelize, DataTypes) => {
     {
       userId: {
         type: DataTypes.INTEGER,
+        unique: true,
         allowNull: false,
         field: 'user_id',
         references: {
           model: 'users',
           key: 'id'
         }
-      },
-      token: {
-        type: DataTypes.STRING,
-        allowNull: false
       }
     },
     { underscored: true }
   );
 
-  Session.remove = query => Session.destroy({ where: { ...query } });
-  Session.createSession = ({ token, userId }) => Session.findOrCreate({ where: { userId, token } });
-  Session.findBy = query => Session.findOne({ where: { ...query } });
+  Session.remove = userId => Session.destroy({ where: { userId } });
+  Session.createSession = userId => Session.create({ userId });
+  Session.findBy = userId => Session.findOne({ where: { userId } });
   Session.removeAttribute('id');
   return Session;
 };

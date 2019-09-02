@@ -17,8 +17,7 @@ factory.define('album', UserAlbum, {
 });
 
 factory.define('session', Session, {
-  userId: 1,
-  token: createToken({ userId: 1 })
+  userId: 1
 });
 
 exports.runFactory = factoryName => count =>
@@ -27,11 +26,11 @@ exports.runFactory = factoryName => count =>
 exports.authorizationFactory = {
   regular: userId => {
     const token = createToken({ userId, role: REGULAR_ROLE });
-    return Session.createSession({ userId, token }).then(() => ({ authorization: token }));
+    return Session.createSession(userId).then(() => ({ authorization: token }));
   },
   admin: userId => {
     const token = createToken({ userId, role: ADMIN_ROLE });
-    return Session.createSession({ userId, token }).then(() => ({ authorization: token }));
+    return Session.createSession(userId).then(() => ({ authorization: token }));
   },
   invalid: { authorization: 'invalid' }
 };

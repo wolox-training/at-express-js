@@ -4,8 +4,7 @@ const { Session } = require('../models');
 
 exports.validateToken = (req, res, next) => {
   const { authorization } = req.headers;
-  const findSession = sessionData =>
-    Promise.all([Session.findBy({ userId: sessionData.userId, token: authorization }), sessionData]);
+  const findSession = sessionData => Promise.all([Session.findBy(sessionData.userId), sessionData]);
   const checkSession = ([session, sessionData]) => {
     if (!session) {
       throw sessionExpiredError('Your session has been closed');

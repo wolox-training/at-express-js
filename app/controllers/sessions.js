@@ -16,7 +16,7 @@ exports.signIn = (req, res, next) => {
         throw authenticationError(authenticationErrorMessage);
       }
       const token = createToken({ userId: user.id, role: user.role });
-      return Promise.all([createSession({ token, userId: user.id }), token]);
+      return Promise.all([createSession(user.id), token]);
     })
     .then(result => res.set('authorization', result[1]).end())
     .catch(error => {
