@@ -16,7 +16,8 @@ exports.config = {
       secret: 'some-super-secret'
     },
     session: {
-      secret: 'some-super-secret'
+      secret: 'some-super-secret',
+      sessionExpiration: 3000
     }
   }
 };

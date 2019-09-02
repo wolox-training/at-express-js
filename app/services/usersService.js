@@ -1,7 +1,10 @@
+const moment = require('moment');
 const { User } = require('../models');
 const { notFoundError } = require('../errors');
 const { userNotFoundErrorMessage, ADMIN_ROLE } = require('../helpers');
 const { handleError } = require('./commons/errorHandler');
+const { createToken } = require('../helpers');
+const { sessionExpiration } = require('../../config').common.session;
 
 exports.getAllUsers = (getPage, pageSize, offset, limit) =>
   User.getAll({ offset, limit }).catch(handleError('Unable to get users'));
@@ -32,3 +35,20 @@ exports.createAdminUser = hashedUser =>
 
 exports.invalidateUserSessions = userId =>
   User.invalidateSessions(userId).catch(handleError('Unable to invalidate user sessions'));
+
+exports.createSessionToken = user => {
+  const today = new Date();
+  const expirationDate = moment(today)
+    .add(sessionExpiration)
+    .toDate();
+
+  return [
+    createToken({
+      userId: user.id,
+      role: user.role,
+      createdAt: today,
+      expires: expirationDate
+    }),
+    expirationDate
+  ];
+};
