@@ -41,7 +41,7 @@ exports.signIn = (req, res, next) => {
       }
       const [token, expirationDate] = createSessionToken(user);
 
-      return res.set('authorization', token).send({ tokenExpiresAt: expirationDate.toDateString() });
+      return res.set('authorization', token).send({ tokenExpiresAt: expirationDate.toString() });
     })
     .catch(error => {
       logger.error(error);
