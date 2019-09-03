@@ -1,9 +1,9 @@
 const { factory } = require('factory-girl');
 const { hashPassword } = require('../../app/services/encryption');
 const { User, UserAlbum } = require('../../app/models');
-const { EMAIL_DOMAIN, createToken, REGULAR_ROLE, ADMIN_ROLE } = require('../../app/helpers');
+const { EMAIL_DOMAIN, REGULAR_ROLE, ADMIN_ROLE } = require('../../app/helpers');
 const { extractField } = require('../serializers/fieldExtractor');
-
+const { createSessionToken } = require('../../app/services/usersService');
 factory.define('user', User, {
   firstName: factory.chance('first'),
   lastName: factory.chance('last'),
@@ -20,7 +20,7 @@ factory.define('album', UserAlbum, {
 });
 
 exports.authorizationFactory = {
-  regular: id => ({ authorization: createToken({ userId: id, role: REGULAR_ROLE, createdAt: new Date() }) }),
-  admin: id => ({ authorization: createToken({ userId: id, role: ADMIN_ROLE, createdAt: new Date() }) }),
+  regular: id => ({ authorization: createSessionToken({ id, role: REGULAR_ROLE }) }),
+  admin: id => ({ authorization: createSessionToken({ id, role: ADMIN_ROLE }) }),
   invalid: { authorization: 'invalid' }
 };

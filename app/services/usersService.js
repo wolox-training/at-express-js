@@ -41,7 +41,6 @@ exports.createSessionToken = user => {
   const expirationDate = moment(today)
     .add(sessionExpiration)
     .toDate();
-
   return [
     createToken({
       userId: user.id,
