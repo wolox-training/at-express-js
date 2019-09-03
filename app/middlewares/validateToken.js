@@ -26,7 +26,7 @@ exports.validateToken = (req, res, next) => {
 
     if (
       !user.sessionInvalid ||
-      moment(token.createdAt)
+      moment(token.iat)
         .utc()
         .isAfter(user.sessionInvalid)
     ) {

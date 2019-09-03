@@ -7,6 +7,7 @@ const { runFactory, authorizationFactory } = require('./helpers');
 const createUsers = runFactory('user');
 const { AUTHENTICATION_ERROR } = require('../app/errors');
 const { User } = require('../app/models');
+const { invalidateUserSessions } = require('../app/services/usersService');
 
 describe('POST /users/sessions/invalidate_all', () => {
   it('should succeed when user is authenticated', () =>
@@ -30,6 +31,24 @@ describe('POST /users/sessions/invalidate_all', () => {
   it('should fail because user is not authenticated', () =>
     createUsers(1)
       .then(() => request.post('/users/sessions/invalidate_all').set(authorizationFactory.invalid))
+      .then(response => {
+        expect(response.statusCode).to.equal(401);
+        expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
+      }));
+
+  it('GET /users should fail because sessions have been invalidated', () =>
+    createUsers(1)
+      .then(([{ id }]) => [authorizationFactory.regular(id), id])
+      .then(
+        ([authorization, id]) =>
+          new Promise(resolve => {
+            setTimeout(async () => {
+              await invalidateUserSessions(id);
+              return resolve(authorization);
+            }, 4000);
+          })
+      )
+      .then(authorization => request.get('/users').set(authorization))
       .then(response => {
         expect(response.statusCode).to.equal(401);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
