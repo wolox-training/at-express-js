@@ -20,7 +20,7 @@ exports.validateToken = (req, res, next) => {
       throw authenticationError('User not found');
     }
 
-    if (moment(token.expires).isBefore(new Date())) {
+    if (moment(token.exp).isBefore(new Date())) {
       throw authenticationError('Token expired');
     }
 

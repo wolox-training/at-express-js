@@ -46,8 +46,8 @@ exports.createSessionToken = user => {
     createToken({
       userId: user.id,
       role: user.role,
-      createdAt: today,
-      expires: expirationDate
+      iat: today,
+      exp: expirationDate
     }),
     expirationDate
   ];
