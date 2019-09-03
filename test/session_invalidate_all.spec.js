@@ -36,21 +36,21 @@ describe('POST /users/sessions/invalidate_all', () => {
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
       }));
 
-  it('GET /users should fail because sessions have been invalidated', () =>
-    createUsers(1)
-      .then(([{ id }]) => [authorizationFactory.regular(id), id])
-      .then(
-        ([authorization, id]) =>
-          new Promise(resolve => {
-            setTimeout(async () => {
-              await invalidateUserSessions(id);
-              return resolve(authorization);
-            }, 4000);
-          })
-      )
-      .then(authorization => request.get('/users').set(authorization))
+  it('GET /users should fail because sessions have been invalidated', () => {
+    const createAuthorization = ([{ id }]) => [authorizationFactory.regular(id), id];
+    const waitAndInvalidateSessions = ([authorization, id]) =>
+      new Promise(resolve => {
+        setTimeout(() => invalidateUserSessions(id).then(() => resolve(authorization)), 4000);
+      });
+    const getUsers = authorization => request.get('/users').set(authorization);
+
+    return createUsers(1)
+      .then(createAuthorization)
+      .then(waitAndInvalidateSessions)
+      .then(getUsers)
       .then(response => {
         expect(response.statusCode).to.equal(401);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
-      }));
+      });
+  });
 });
