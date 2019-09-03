@@ -50,6 +50,14 @@ const config = {
       header_name: 'authorization',
       secret: process.env.NODE_API_SESSION_SECRET,
       expirationTime: process.env.TOKEN_EXPIRATION_TIME
+    },
+    email: {
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
     }
   }
 };

@@ -13,6 +13,7 @@ const {
   invalidateUserSessions,
   createSessionToken
 } = require('../services/usersService');
+const { sendWelcomeEmail } = require('../services/emails');
 
 const getUserFields = extractFields(userSchema, 'password');
 
@@ -20,9 +21,10 @@ exports.signUp = (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
   return hashPassword({ firstName, lastName, email, password })
     .then(createUser)
-    .then(result => {
-      logger.info(`A user '${result.firstName}' has been created`);
-      res.status(201).send({ userId: result.id });
+    .then(user => {
+      sendWelcomeEmail(user);
+      logger.info(`A user '${user.firstName}' has been created`);
+      res.status(201).send({ userId: user.id });
     })
     .catch(error => {
       logger.error(error.message);

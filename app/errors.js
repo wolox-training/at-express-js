@@ -32,3 +32,6 @@ exports.notFoundError = message => internalError(message, exports.NOT_FOUND_ERRO
 
 exports.FORBIDDEN_ERROR = 'forbidden_error';
 exports.forbiddenError = message => internalError(message, exports.FORBIDDEN_ERROR);
+
+exports.EMAIL_SEND_ERROR = 'email_send_error';
+exports.emailSendError = message => internalError(message, exports.EMAIL_SEND_ERROR);

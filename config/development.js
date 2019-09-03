@@ -8,5 +8,13 @@ exports.config = {
       name: process.env.DB_NAME_DEV
     }
   },
+  email: {
+    host: process.env.DEV_EMAIL_HOST,
+    port: process.env.DEV_EMAIL_PORT,
+    auth: {
+      user: process.env.DEV_EMAIL_USER,
+      pass: process.env.DEV_EMAIL_PASS
+    }
+  },
   isDevelopment: true
 };
