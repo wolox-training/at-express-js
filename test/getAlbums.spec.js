@@ -2,9 +2,9 @@ const supertest = require('supertest');
 const { expect } = require('chai');
 const app = require('../app');
 const request = supertest(app);
-const { runFactory } = require('./helpers');
 const { AUTHENTICATION_ERROR, FORBIDDEN_ERROR } = require('../app/errors');
-const { authorizationFactory } = require('./helpers');
+const { authorizationFactory, runFactory } = require('./helpers');
+const { REGULAR_ROLE, ADMIN_ROLE } = require('../app/helpers/constants');
 
 const createUsers = runFactory('user');
 const createAlbums = runFactory('album');
@@ -19,30 +19,36 @@ const checkSuccessfulResponse = response => {
   });
 };
 
+const createAssets = () => Promise.all([createUsers(2), createAlbums(5)]);
+const getAlbums = (type, id) => () => {
+  const auth = id && type ? authorizationFactory[type](id) : {};
+  return request.get('/users/1/albums').set(auth);
+};
+
 describe('GET /users/:userId/albums', () => {
   it('should succeed when user is authenticated and requested user exists', () =>
-    Promise.all([createUsers(1), createAlbums(5)])
-      .then(() => request.get('/users/1/albums').set(authorizationFactory.regular(1)))
+    createAssets()
+      .then(getAlbums(REGULAR_ROLE, 1))
       .then(checkSuccessfulResponse));
 
   it('should fail because user is not authenticated', () =>
-    Promise.all([createUsers(1), createAlbums(5)])
-      .then(() => request.get('/users/1/albums'))
+    createAssets()
+      .then(getAlbums())
       .then(response => {
         expect(response.statusCode).to.equal(401);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
       }));
 
   it('should fail because user does not have permission when user requested is different from user logged', () =>
-    Promise.all([createUsers(2), createAlbums(5)])
-      .then(() => request.get('/users/1/albums').set(authorizationFactory.regular(2)))
+    createAssets()
+      .then(getAlbums(REGULAR_ROLE, 2))
       .then(response => {
         expect(response.statusCode).to.equal(403);
         expect(response.body.internal_code).to.equal(FORBIDDEN_ERROR);
       }));
 
   it('should succeed because user is admin when user requested is different from user logged', () =>
-    Promise.all([createUsers(2), createAlbums(5)])
-      .then(() => request.get('/users/1/albums').set(authorizationFactory.admin(2)))
+    createAssets()
+      .then(getAlbums(ADMIN_ROLE, 2))
       .then(checkSuccessfulResponse));
 });

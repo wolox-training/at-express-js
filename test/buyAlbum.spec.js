@@ -10,21 +10,24 @@ const albumId = 1;
 const userId = 1;
 const authorization = authorizationFactory.regular(userId);
 const createUser = runFactory('user');
+const buyAlbum = () =>
+  request
+    .post(`/albums/${albumId}`)
+    .send({})
+    .set(authorization);
+const createUserAndBuyAlbum = () => createUser(1).then(buyAlbum);
 
 describe('POST /albums/:id', () => {
   it('should succeed when user is authenticated and has not bought the album already', () => {
     getAlbum(albumId);
-    return createUser(1)
-      .then(() =>
-        request
-          .post(`/albums/${albumId}`)
-          .send({})
-          .set(authorization)
-      )
-      .then(response => {
-        expect(response.statusCode).to.equal(201);
-        return UserAlbum.findOne({ where: { albumId, userId } });
-      })
+
+    const findAlbum = response => {
+      expect(response.statusCode).to.equal(201);
+      return UserAlbum.findOne({ where: { albumId, userId } });
+    };
+
+    return createUserAndBuyAlbum()
+      .then(findAlbum)
       .then(album => {
         expect(album.albumId).to.equal(albumId);
         expect(album.userId).to.equal(userId);
@@ -43,29 +46,16 @@ describe('POST /albums/:id', () => {
 
   it('should fail because album does not exists', () => {
     notFoundAlbum(albumId);
-    return createUser(1)
-      .then(() =>
-        request
-          .post(`/albums/${albumId}`)
-          .send({})
-          .set(authorization)
-      )
-      .then(response => {
-        expect(response.statusCode).to.equal(404);
-        expect(response.body.internal_code).to.equal(NOT_FOUND_ERROR);
-      });
+    return createUserAndBuyAlbum().then(response => {
+      expect(response.statusCode).to.equal(404);
+      expect(response.body.internal_code).to.equal(NOT_FOUND_ERROR);
+    });
   });
 
   it('should fail because the album was already bought', () => {
     getAlbum(albumId);
     return UserAlbum.create({ albumId, userId })
-      .then(() => createUser(1))
-      .then(() =>
-        request
-          .post(`/albums/${albumId}`)
-          .send({})
-          .set(authorization)
-      )
+      .then(createUserAndBuyAlbum)
       .then(response => {
         expect(response.statusCode).to.equal(422);
         expect(response.body.internal_code).to.equal(ENTITY_ALREADY_EXISTS);
