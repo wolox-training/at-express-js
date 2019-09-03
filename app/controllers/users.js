@@ -39,7 +39,7 @@ exports.signIn = (req, res, next) => {
       if (!arePasswordEql) {
         throw authenticationError(authenticationErrorMessage);
       }
-      const token = createToken({ userId: user.id, role: user.role, createdAt: new Date() });
+      const token = createToken({ userId: user.id, role: user.role, iat: new Date() });
       res.set('authorization', token).end();
     })
     .catch(error => {
