@@ -4,7 +4,7 @@ const { notFoundError } = require('../errors');
 const { userNotFoundErrorMessage, ADMIN_ROLE } = require('../helpers');
 const { handleError } = require('./commons/errorHandler');
 const { createToken } = require('../helpers');
-const { sessionExpiration } = require('../../config').common.session;
+const { session } = require('../../config').common;
 
 exports.getAllUsers = (getPage, pageSize, offset, limit) =>
   User.getAll({ offset, limit }).catch(handleError('Unable to get users'));
@@ -37,9 +37,10 @@ exports.invalidateUserSessions = userId =>
   User.invalidateSessions(userId).catch(handleError('Unable to invalidate user sessions'));
 
 exports.createSessionToken = user => {
+  console.log(session);
   const today = new Date();
   const expirationDate = moment(today)
-    .add(sessionExpiration)
+    .add(session.sessionExpiration)
     .toDate();
   return [
     createToken({
