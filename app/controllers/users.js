@@ -41,7 +41,7 @@ exports.signIn = (req, res, next) => {
       if (!arePasswordEql) {
         throw authenticationError(authenticationErrorMessage);
       }
-      const [token, expirationDate] = createSessionToken(user);
+      const { token, expirationDate } = createSessionToken(user);
 
       return res.set('authorization', token).send({ tokenExpiresAt: expirationDate.toString() });
     })

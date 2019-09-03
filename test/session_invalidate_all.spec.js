@@ -4,6 +4,7 @@ const supertest = require('supertest');
 const app = require('../app');
 const request = supertest(app);
 const { runFactory, authorizationFactory } = require('./helpers');
+const { waitForAWhile } = require('./helpers/utils');
 const createUsers = runFactory('user');
 const { AUTHENTICATION_ERROR } = require('../app/errors');
 const { User } = require('../app/models');
@@ -36,21 +37,20 @@ describe('POST /users/sessions/invalidate_all', () => {
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
       }));
 
-  it('GET /users should fail because sessions have been invalidated', () =>
-    createUsers(1)
-      .then(([{ id }]) => [authorizationFactory.regular(id), id])
-      .then(
-        ([authorization, id]) =>
-          new Promise(resolve => {
-            setTimeout(async () => {
-              await invalidateUserSessions(id);
-              return resolve(authorization);
-            }, 4000);
-          })
-      )
-      .then(authorization => request.get('/users').set(authorization))
+  it('GET /users should fail because sessions have been invalidated', () => {
+    const createAuthorization = ([{ id }]) => [authorizationFactory.regular(id), id];
+    const waitAndInvalidateSessions = ([authorization, id]) =>
+      waitForAWhile(4000, () => invalidateUserSessions(id).then(() => authorization));
+
+    const getUsers = authorization => request.get('/users').set(authorization);
+
+    return createUsers(1)
+      .then(createAuthorization)
+      .then(waitAndInvalidateSessions)
+      .then(getUsers)
       .then(response => {
         expect(response.statusCode).to.equal(401);
         expect(response.body.internal_code).to.equal(AUTHENTICATION_ERROR);
-      }));
+      });
+  });
 });
