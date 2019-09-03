@@ -37,11 +37,11 @@ exports.invalidateUserSessions = userId =>
   User.invalidateSessions(userId).catch(handleError('Unable to invalidate user sessions'));
 
 exports.createSessionToken = user => {
-  console.log(session);
   const today = new Date();
   const expirationDate = moment(today)
-    .add(session.sessionExpiration)
+    .add(session.expirationTime)
     .toDate();
+
   return [
     createToken({
       userId: user.id,
