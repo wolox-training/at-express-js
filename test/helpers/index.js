@@ -20,7 +20,7 @@ factory.define('album', UserAlbum, {
 });
 
 exports.authorizationFactory = {
-  regular: id => ({ authorization: createSessionToken({ id, role: REGULAR_ROLE }) }),
-  admin: id => ({ authorization: createSessionToken({ id, role: ADMIN_ROLE }) }),
+  regular: id => ({ authorization: createSessionToken({ id, role: REGULAR_ROLE }).token }),
+  admin: id => ({ authorization: createSessionToken({ id, role: ADMIN_ROLE }).token }),
   invalid: { authorization: 'invalid' }
 };

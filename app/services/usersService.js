@@ -1,4 +1,3 @@
-const moment = require('moment');
 const { User } = require('../models');
 const { notFoundError } = require('../errors');
 const { userNotFoundErrorMessage, ADMIN_ROLE } = require('../helpers');
@@ -37,18 +36,17 @@ exports.invalidateUserSessions = userId =>
   User.invalidateSessions(userId).catch(handleError('Unable to invalidate user sessions'));
 
 exports.createSessionToken = user => {
-  const today = new Date();
-  const expirationDate = moment(today)
-    .add(session.expirationTime)
-    .toDate();
+  const today = Date.now() / 1000;
+  const expirationDate = (Date.now() + session.expirationTime) / 1000;
+  const token = createToken({
+    userId: user.id,
+    role: user.role,
+    iat: today,
+    exp: expirationDate
+  });
 
-  return [
-    createToken({
-      userId: user.id,
-      role: user.role,
-      iat: today,
-      exp: expirationDate
-    }),
+  return {
+    token,
     expirationDate
-  ];
+  };
 };
