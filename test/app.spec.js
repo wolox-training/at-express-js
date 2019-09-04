@@ -3,6 +3,10 @@ const fs = require('fs'),
   models = require('../app/models'),
   path = require('path');
 
+const emails = require('../app/services/emails');
+jest.mock('../app/services/emails');
+emails.sendWelcomeEmail.mockResolvedValue('SEND EMAIL');
+
 const tables = Object.values(models.sequelize.models);
 
 const truncateTable = model =>

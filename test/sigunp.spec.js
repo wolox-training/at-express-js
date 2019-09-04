@@ -1,5 +1,5 @@
 const supertest = require('supertest');
-const { expect } = require('chai');
+const { expect: expectChai } = require('chai');
 const bcrypt = require('bcryptjs');
 const app = require('../app');
 const { User } = require('../app/models');
@@ -30,7 +30,7 @@ describe('POST /users', () => {
   it('should success when data passes validation checks', () =>
     createUser(mockUser)
       .then(res => {
-        expect(res.statusCode).to.equal(201);
+        expectChai(res.statusCode).to.equal(201);
         return User.findOne({ where: { email: mockUser.email } });
       })
       .then(user => {
@@ -38,83 +38,83 @@ describe('POST /users', () => {
         return Promise.all([user, arePasswordsEqual]);
       })
       .then(([user, arePasswordsEqual]) => {
-        expect(arePasswordsEqual).to.equal(true);
-        expect(user.firstName).to.equal(mockUser.firstName);
-        expect(user.lastName).to.equal(mockUser.lastName);
-        expect(user.email).to.equal(mockUser.email);
+        expectChai(arePasswordsEqual).to.equal(true);
+        expectChai(user.firstName).to.equal(mockUser.firstName);
+        expectChai(user.lastName).to.equal(mockUser.lastName);
+        expectChai(user.email).to.equal(mockUser.email);
       }));
 
   it('should fail because email already exists', () =>
     createUser(mockUser)
       .then(() => request.post('/users').send(mockUser))
       .then(response => {
-        expect(response.body.message).to.include(alreadyExistsErrorMessage);
-        expect(response.body.internal_code).to.equal(ENTITY_ALREADY_EXISTS);
-        expect(response.statusCode).to.equal(422);
+        expectChai(response.body.message).to.include(alreadyExistsErrorMessage);
+        expectChai(response.body.internal_code).to.equal(ENTITY_ALREADY_EXISTS);
+        expectChai(response.statusCode).to.equal(422);
       }));
 
   it('should fail because password is badly formatted (too short)', () =>
     createUser(passwordTooShortUser).then(response => {
-      expect(response.body.message).to.include(invalidPasswordLengthMessage);
-      expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
-      expect(response.statusCode).to.equal(422);
+      expectChai(response.body.message).to.include(invalidPasswordLengthMessage);
+      expectChai(response.body.internal_code).to.equal(VALIDATION_ERROR);
+      expectChai(response.statusCode).to.equal(422);
     }));
 
   it('should fail because password is badly formatted (not containing letters and numbers)', () =>
     createUser(wrongFormatPasswordUser).then(response => {
-      expect(response.body.message).to.include(invalidPasswordMessage);
-      expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
-      expect(response.statusCode).to.equal(422);
+      expectChai(response.body.message).to.include(invalidPasswordMessage);
+      expectChai(response.body.internal_code).to.equal(VALIDATION_ERROR);
+      expectChai(response.statusCode).to.equal(422);
     }));
 
   it(`should fail because email is not ${EMAIL_DOMAIN}`, () =>
     createUser(wrongDomainUser).then(response => {
-      expect(response.body.message).to.include(invalidEmailDomainMessage);
-      expect(response.body.internal_code).to.equal(VALIDATION_ERROR);
-      expect(response.statusCode).to.equal(422);
+      expectChai(response.body.message).to.include(invalidEmailDomainMessage);
+      expectChai(response.body.internal_code).to.equal(VALIDATION_ERROR);
+      expectChai(response.statusCode).to.equal(422);
     }));
 
   it('should fail because firstName is missing', () =>
     createUser(firstNameMissingUser).then(response => {
-      expect(response.body.message).to.include(missingRequiredFieldsMessage);
-      expect(response.body.message).to.include('firstName');
-      expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
-      expect(response.statusCode).to.equal(400);
+      expectChai(response.body.message).to.include(missingRequiredFieldsMessage);
+      expectChai(response.body.message).to.include('firstName');
+      expectChai(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
+      expectChai(response.statusCode).to.equal(400);
     }));
 
   it('should fail because lastName is missing', () =>
     createUser(lastNameMissingUser).then(response => {
-      expect(response.body.message).to.include(missingRequiredFieldsMessage);
-      expect(response.body.message).to.include('lastName');
-      expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
-      expect(response.statusCode).to.equal(400);
+      expectChai(response.body.message).to.include(missingRequiredFieldsMessage);
+      expectChai(response.body.message).to.include('lastName');
+      expectChai(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
+      expectChai(response.statusCode).to.equal(400);
     }));
 
   it('should fail because email is missing', () =>
     createUser(emailMissingUser).then(response => {
-      expect(response.body.message).to.include(missingRequiredFieldsMessage);
-      expect(response.body.message).to.include('email');
-      expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
-      expect(response.statusCode).to.equal(400);
+      expectChai(response.body.message).to.include(missingRequiredFieldsMessage);
+      expectChai(response.body.message).to.include('email');
+      expectChai(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
+      expectChai(response.statusCode).to.equal(400);
     }));
 
   it('should fail because password is missing', () =>
     createUser(passwordMissingUser).then(response => {
-      expect(response.body.message).to.include(missingRequiredFieldsMessage);
-      expect(response.body.message).to.include('password');
-      expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
-      expect(response.statusCode).to.equal(400);
+      expectChai(response.body.message).to.include(missingRequiredFieldsMessage);
+      expectChai(response.body.message).to.include('password');
+      expectChai(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
+      expectChai(response.statusCode).to.equal(400);
     }));
 
   it('should  fail because of several missing fields', () =>
     createUser(emptyUser).then(response => {
       const msg = response.body.message;
-      expect(msg).to.include(missingRequiredFieldsMessage);
-      expect(msg).to.include('firstName');
-      expect(msg).to.include('lastName');
-      expect(msg).to.include('email');
-      expect(msg).to.include('password');
-      expect(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
-      expect(response.statusCode).to.equal(400);
+      expectChai(msg).to.include(missingRequiredFieldsMessage);
+      expectChai(msg).to.include('firstName');
+      expectChai(msg).to.include('lastName');
+      expectChai(msg).to.include('email');
+      expectChai(msg).to.include('password');
+      expectChai(response.body.internal_code).to.equal(MISSING_DATA_ERROR);
+      expectChai(response.statusCode).to.equal(400);
     }));
 });

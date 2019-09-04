@@ -4,7 +4,7 @@ const app = require('../app');
 const request = supertest(app);
 const { AUTHENTICATION_ERROR, FORBIDDEN_ERROR } = require('../app/errors');
 const { authorizationFactory, runFactory } = require('./helpers');
-const { REGULAR_ROLE, ADMIN_ROLE } = require('../app/helpers/constants');
+const { REGULAR_ROLE, ADMIN_ROLE } = require('../app/templates/constants');
 
 const createUsers = runFactory('user');
 const createAlbums = runFactory('album');
