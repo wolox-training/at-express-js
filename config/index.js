@@ -48,7 +48,8 @@ const config = {
     },
     session: {
       header_name: 'authorization',
-      secret: process.env.NODE_API_SESSION_SECRET
+      secret: process.env.NODE_API_SESSION_SECRET,
+      expirationTime: process.env.TOKEN_EXPIRATION_TIME || 1800000
     }
   }
 };

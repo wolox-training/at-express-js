@@ -1,5 +1,4 @@
 const logger = require('../logger');
-const { createToken } = require('../helpers');
 const { hashPassword, comparePassword } = require('../services/encryption');
 const { authenticationErrorMessage } = require('../helpers');
 const { authenticationError, NOT_FOUND_ERROR } = require('../errors');
@@ -11,7 +10,8 @@ const {
   createUser,
   createAdminUser,
   getUserByEmail,
-  invalidateUserSessions
+  invalidateUserSessions,
+  createSessionToken
 } = require('../services/usersService');
 
 const getUserFields = extractFields(userSchema, 'password');
@@ -39,8 +39,9 @@ exports.signIn = (req, res, next) => {
       if (!arePasswordEql) {
         throw authenticationError(authenticationErrorMessage);
       }
-      const token = createToken({ userId: user.id, role: user.role, iat: new Date() });
-      res.set('authorization', token).end();
+      const { token, expirationDate } = createSessionToken(user);
+
+      return res.set('authorization', token).send({ tokenExpiresAt: expirationDate.toString() });
     })
     .catch(error => {
       logger.error(error);

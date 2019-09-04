@@ -19,6 +19,7 @@ exports.validateToken = (req, res, next) => {
     if (!user) {
       throw authenticationError('User not found');
     }
+
     if (
       !user.sessionInvalid ||
       moment(token.iat)
