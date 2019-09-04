@@ -3,7 +3,7 @@ const { getValidationErrors } = require('./middlewares/getValidationErrors');
 const { validatePermissions, validateAlbumPermissions } = require('./middlewares/validatePermissions');
 const { healthCheck } = require('./controllers/healthCheck');
 const { getAlbums, getPhotos, buyAlbum, getUserAlbumPhotos } = require('./controllers/albums');
-const { signUp, signIn, getUsers, createAdmin } = require('./controllers/users');
+const { signUp, signIn, getUsers, createAdmin, invalidateAllSessions } = require('./controllers/users');
 const { userSchema } = require('./schemas/userSchema');
 const { signedUpUserSchema } = require('./schemas/signedUpUserSchema');
 const { validateToken } = require('./middlewares/validateToken');
@@ -22,6 +22,7 @@ exports.init = app => {
   app.get('/users/albums/:albumId/photos', [validateToken], getUserAlbumPhotos);
   app.post('/users', [checkSchema(userSchema), getValidationErrors], signUp);
   app.post('/users/sessions', [checkSchema(signedUpUserSchema), getValidationErrors], signIn);
+  app.post('/users/sessions/invalidate_all', validateToken, invalidateAllSessions);
   app.post(
     '/admin/users',
     [checkSchema(userSchema), getValidationErrors, validateToken, validatePermissions([ADMIN_ROLE])],

@@ -1,17 +1,17 @@
 const logger = require('../logger');
-const { createToken } = require('../helpers');
 const { hashPassword, comparePassword } = require('../services/encryption');
 const { authenticationErrorMessage } = require('../helpers');
 const { authenticationError, NOT_FOUND_ERROR } = require('../errors');
 const { extractFields, paginatedResponse } = require('../serializers');
 const { userSchema } = require('../schemas/userSchema');
-
 const {
   getAllUsers,
   getUserById,
   createUser,
   createAdminUser,
-  getUserByEmail
+  getUserByEmail,
+  invalidateUserSessions,
+  createSessionToken
 } = require('../services/usersService');
 
 const getUserFields = extractFields(userSchema, 'password');
@@ -39,8 +39,9 @@ exports.signIn = (req, res, next) => {
       if (!arePasswordEql) {
         throw authenticationError(authenticationErrorMessage);
       }
-      const token = createToken({ userId: user.id, role: user.role });
-      res.set('authorization', token).end();
+      const { token, expirationDate } = createSessionToken(user);
+
+      return res.set('authorization', token).send({ tokenExpiresAt: expirationDate.toString() });
     })
     .catch(error => {
       logger.error(error);
@@ -96,3 +97,8 @@ exports.createAdmin = (req, res, next) => {
     .then(respond)
     .catch(next);
 };
+
+exports.invalidateAllSessions = (req, res, next) =>
+  invalidateUserSessions(req.locals.userId)
+    .then(() => res.status(204).end())
+    .catch(next);

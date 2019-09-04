@@ -28,6 +28,13 @@ module.exports = (sequelize, DataTypes) => {
       role: {
         type: DataTypes.STRING,
         defaultValue: REGULAR_ROLE
+      },
+      sessionInvalid: {
+        type: DataTypes.DATE,
+        field: 'session_invalidate',
+        options: {
+          timezone: '+00:00'
+        }
       }
     },
     { underscored: true }
@@ -42,6 +49,8 @@ module.exports = (sequelize, DataTypes) => {
       count: result.count,
       rows: extractField('dataValues')(result.rows)
     }));
+
+  User.invalidateSessions = userId => User.update({ sessionInvalid: new Date() }, { where: { id: userId } });
 
   return User;
 };
