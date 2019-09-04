@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { SALT_ROUNDS } = require('../templates/constants');
+const { SALT_ROUNDS } = require('../helpers/constants');
 const logger = require('../logger');
 const { encryptionError } = require('../errors');
 

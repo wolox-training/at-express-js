@@ -1,5 +1,5 @@
 const { entityAlreadyExists, validationError } = require('../errors');
-const { alreadyExistsErrorMessage, validationErrorMessage } = require('../templates/constants');
+const { alreadyExistsErrorMessage, validationErrorMessage } = require('./constants');
 
 exports.dbErrorCodes = {
   SequelizeUniqueConstraintError: {

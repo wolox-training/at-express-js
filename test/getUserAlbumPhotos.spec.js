@@ -5,7 +5,7 @@ const request = supertest(app);
 const { getAlbumsPhotos } = require('./mocks/mockPhotos');
 const { runFactory, authorizationFactory } = require('./helpers');
 const { AUTHENTICATION_ERROR, NOT_FOUND_ERROR } = require('../app/errors');
-const { ADMIN_ROLE, REGULAR_ROLE } = require('../app/templates/constants');
+const { ADMIN_ROLE, REGULAR_ROLE } = require('../app/helpers/constants');
 const createAlbums = runFactory('album');
 const createUser = runFactory('user');
 
