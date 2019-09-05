@@ -25,6 +25,7 @@ const { ENTITY_ALREADY_EXISTS, MISSING_DATA_ERROR, VALIDATION_ERROR } = require(
 const request = supertest(app);
 const createUser = user => request.post('/users').send(user);
 const emails = require('../app/services/emails');
+emails.sendWelcomeEmail = jest.fn();
 
 describe('POST /users', () => {
   beforeEach(() => {
